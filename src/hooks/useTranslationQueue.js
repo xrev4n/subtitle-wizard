@@ -97,11 +97,13 @@ export function useTranslationQueue({ subtitles, setSubtitles, settings }) {
 
         if (result.ok && result.translations) {
           const translationsMap = result.translations;
+          let successfulCount = 0;
           setSubtitles((prev) =>
             prev.map((c) => {
               if (batchIds.has(c.id)) {
                 const translatedText = translationsMap[c.id];
                 if (translatedText !== undefined && translatedText.length > 0) {
+                  successfulCount++;
                   return {
                     ...c,
                     targetText: translatedText,
@@ -114,7 +116,7 @@ export function useTranslationQueue({ subtitles, setSubtitles, settings }) {
               return c;
             })
           );
-          translatedSoFarRef.current += batch.length;
+          translatedSoFarRef.current += successfulCount;
         } else {
           // Mark batch as error
           setSubtitles((prev) =>

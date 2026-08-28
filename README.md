@@ -14,7 +14,7 @@
 - **Zero-Cloud & 100% Local**: No subtitle content, video, or audio ever leaves the user's browser.
 - **Unified Workspace & Always-On Studio**: An elegant, continuous interface where the Media Stage (Video or Dark Canvas Preview) and the Spotify Lyrics/Live Editor coexist side-by-side.
 - **Local LLM Inference**: Direct browser-to-server HTTP communication with local OpenAI-compatible APIs (LM Studio, Ollama, LocalAI, vLLM).
-- **AI Batch Translation Engine**: Slices subtitle cues into configurable batches, enforces strict JSON structured output, and updates cues dynamically in memory with live telemetry.
+- **AI Batch Translation Engine with 1:1 ID Guarantee**: Slices subtitle cues into configurable batches, enforces strict JSON structured output, preserves multi-speaker dialogues (`- Speaker 1\n- Speaker 2`), validates 1:1 cue ID integrity, and automatically degrades to 1x1 micro-batching to prevent off-by-one errors.
 - **Interactive In-Memory Subtitle Editor**: In-place text and timestamp editing, cue insertion, cue splitting, adjacent merging, and non-destructive Undo support.
 - **Precision Timing Shift Tools**: Millisecond-accurate global, progressive, or selective time shifts with automatic zero clamping.
 - **Temporal Integrity Diagnostics**: Instant detection and visual flagging of cue overlaps, invalid durations (<100ms), and empty subtitle blocks.
@@ -38,7 +38,7 @@
 | **Timing & Integrity Engine** | Pure ES Modules (`src/utils/timingUtils.js`) | Time shifting, overlap validator, split, merge & insert |
 | **Multi-Format Exporters** | Pure ES Modules (`src/utils/exporters.js`) | SRT, WebVTT, ASS/SSA, Plain text & Bilingual dual |
 | **Local LLM Client** | Native `fetch` + `AbortController` (`src/services/llmService.js`) | Local OpenAI-compatible client for LM Studio / Ollama |
-| **Batch Translation Engine** | Custom Orchestrator (`src/hooks/useTranslationQueue.js` & `translationService.js`) | Strict JSON prompt schema, resilient parser & batch control |
+| **Batch Translation Engine** | Custom Orchestrator (`src/hooks/useTranslationQueue.js` & `translationService.js`) | 1:1 ID validator, multi-speaker dialogue prompt, and 1x1 micro-batch fallback |
 | **Local Media Player** | HTML5 Media API (`src/components/MediaSyncPlayer.jsx`) | Memory-safe `URL.createObjectURL` video/audio live sync & canvas stage |
 | **Spotify Lyrics Panel** | Custom Sync Engine (`src/components/LyricsSyncPanel.jsx`) | Smooth auto-scroll, auto-pause on focus, and channel viewing |
 | **Session Persistence** | Web Storage (`src/services/storageService.js`) | Automatic client-side project snapshot caching |
@@ -94,7 +94,7 @@ subtitle-wizard/
 │   ├── services/
 │   │   ├── llmService.js                 # Native fetch client for /models and /chat/completions
 │   │   ├── storageService.js             # Client project session persistence (localStorage)
-│   │   └── translationService.js         # Prompt builder, resilient JSON extractor & batch translator
+│   │   └── translationService.js         # 1:1 ID validator, dialogue sanitization & batch translator
 │   ├── utils/
 │   │   ├── exporters.js                  # Multi-format converters (SRT, VTT, ASS, TXT, Dual)
 │   │   ├── srtParser.js                  # Core SRT parse, serialize, format & sample generator
@@ -111,6 +111,24 @@ subtitle-wizard/
 
 ---
 
+## 🤖 1:1 Translation Integrity & Multi-Speaker Shield
+
+### 1. Multi-Speaker Dialogue Preservation
+Subtitle cues frequently contain multi-speaker interactions formatted with leading hyphens:
+```
+- Thank you, Gordon.
+- It ranks poor with me too.
+```
+`translationService.js` enforces prompt rules and few-shot examples ensuring the LLM keeps all speakers and line breaks within the **same** cue's `text` property, never creating extra IDs or splitting items.
+
+### 2. Multi-Pass JSON Sanitization (`extractAndParseJSON`)
+Subtitle translations often contain literal newlines inside JSON strings. `extractAndParseJSON` sanitizes raw model output through a multi-pass parser and a regex fallback to guarantee valid extraction without syntax crashes.
+
+### 3. Automatic 1x1 Micro-Batching Fallback
+`validateBatchIntegrity` verifies that every requested cue ID exists in the model's output. If a batch contains mismatched IDs or fails 1:1 validation, the engine automatically degrades to **1x1 micro-batching** for those cues, preventing off-by-one errors and guaranteeing exact alignment without aborting the queue.
+
+---
+
 ## 🚀 Status Tracker & Roadmap (100% MVP Completed)
 
 | Phase | Description | Status | Key Deliverables |
@@ -120,7 +138,7 @@ subtitle-wizard/
 | **Phase 3** | **Batch Translation Engine & Queue Management** | ✅ **Completed** | `translationService.js` with strict JSON prompt schema & resilient parser, `useTranslationQueue.js` hook with pause/resume/cancel/retry, `TranslationControlBar`, `TranslationProgressBar`, dual comparative preview. |
 | **Phase 4** | **Interactive Subtitle Editor & Timing Shift Tools** | ✅ **Completed** | `timingUtils.js` (shift, split, merge, insert, delete, validate), `TimingShiftModal`, in-place editable cues, visual overlap diagnostics, undo history stack. |
 | **Phase 5** | **Multi-Format Export & Synchronized Media Player** | ✅ **Completed** | `exporters.js` (SRT, VTT, ASS, TXT, Dual), `ExportModal`, `MediaSyncPlayer` with live caption overlay and bidirectional click-to-seek, `LyricsSyncPanel` (Spotify Lyrics mode with auto-scroll & auto-pause), `storageService.js` session auto-saving. |
-| **UX Refinement** | **Unified Minimalist Workspace** | ✅ **Completed** | Always-on 2-column Media Studio (Video/Canvas stage + Spotify Lyrics), streamlined toolbar, zero clutter, unified single-view workflow. |
+| **UX Refinement** | **Unified Minimalist Workspace & 1:1 Translation Shield** | ✅ **Completed** | 2-column Media Studio (Video/Canvas stage + Spotify Lyrics), 1:1 translation validation, multi-speaker dialogue preservation, 1x1 micro-batch fallback. |
 
 ---
 
