@@ -16,7 +16,7 @@
 </p>
 
 <p align="center">
-  <a href="#-english">English</a> • <a href="#-español">Español</a> • <a href="#-live-demo">Live Demo</a> • <a href="#-getting-started">Getting Started</a> • <a href="#-contributing">Contributing</a>
+  <a href="#-english">English</a> • <a href="#-español">Español</a> • <a href="#-getting-started">Getting Started</a> • <a href="#-contributing">Contributing</a>
 </p>
 
 ---
