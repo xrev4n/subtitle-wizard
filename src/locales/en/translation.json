@@ -1,0 +1,56 @@
+{
+  "panelTitle": "AI Batch Translation Engine",
+  "panelSubtitle": "Real-time orchestration powered by LM Studio",
+  "languages": {
+    "sourceLabel": "Source Language",
+    "targetLabel": "Target Language",
+    "auto": "Auto-Detect",
+    "en": "English",
+    "es": "Spanish (Español)",
+    "fr": "French (Français)",
+    "de": "German (Deutsch)",
+    "pt": "Portuguese (Português)",
+    "it": "Italian (Italiano)",
+    "ja": "Japanese (日本語)",
+    "zh": "Chinese (中文)",
+    "ko": "Korean (한국어)",
+    "ru": "Russian (Русский)"
+  },
+  "controls": {
+    "start": "Start Translation",
+    "pause": "Pause",
+    "resume": "Resume",
+    "cancel": "Cancel",
+    "retryFailed": "Retry Failed",
+    "serverOffline": "Local server is not connected. Open Settings to connect."
+  },
+  "progress": {
+    "title": "Translation Progress",
+    "batch": "Batch {current} of {total}",
+    "cuesCount": "{completed} of {total} subtitles translated",
+    "speed": "{speed} cues/s",
+    "eta": "Time remaining: ~{eta}",
+    "etaCalculating": "Calculating ETA...",
+    "errorsCount": "{count} errors",
+    "status": {
+      "idle": "Ready to translate",
+      "translating": "Translating batch...",
+      "paused": "Translation paused",
+      "completed": "Translation completed!",
+      "error": "Paused on errors"
+    }
+  },
+  "filters": {
+    "all": "All",
+    "translated": "Translated",
+    "pending": "Pending",
+    "translating": "In Progress",
+    "error": "Errors"
+  },
+  "cues": {
+    "retryCue": "Retry this cue",
+    "translatingStatus": "Translating...",
+    "errorStatus": "Translation error",
+    "translatedStatus": "Translated"
+  }
+}

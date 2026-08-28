@@ -1,0 +1,36 @@
+{
+  "dropzone": {
+    "title": "Drag & drop your SRT file here",
+    "subtitle": "or click to browse your computer",
+    "support": "Supports standard .srt files (UTF-8, Windows CRLF or Unix LF line endings)",
+    "loadedFile": "Loaded file",
+    "fileSize": "Size",
+    "replaceFile": "Replace file",
+    "samplePrompt": "Don't have an SRT file ready?"
+  },
+  "stats": {
+    "totalBlocks": "Total Subtitle Blocks",
+    "totalDuration": "Total Duration",
+    "totalCharacters": "Total Characters",
+    "totalWords": "Total Words",
+    "avgDuration": "Average Duration"
+  },
+  "preview": {
+    "title": "Subtitle Cue Preview",
+    "subtitle": "In-memory validation and timestamp inspection",
+    "searchPlaceholder": "Search by cue text or ID number...",
+    "id": "#",
+    "timing": "Timestamp Range",
+    "duration": "Duration",
+    "sourceText": "Original Source Text",
+    "targetText": "Translated Text",
+    "status": "Status",
+    "emptySource": "(Empty cue text)",
+    "noResults": "No subtitle cues found matching your search term.",
+    "noFileTitle": "No SRT file loaded yet",
+    "noFileDescription": "Upload an .srt file or click 'Load Sample' to parse and analyze subtitle cues in memory.",
+    "showing": "Showing",
+    "of": "of",
+    "blocks": "blocks"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "title": "Export Subtitles",
+  "subtitle": "Download your subtitles in multiple industry formats with custom modes",
+  "formats": {
+    "srt": "SubRip (.srt)",
+    "vtt": "WebVTT (.vtt)",
+    "ass": "Advanced SubStation (.ass)",
+    "txt": "Plain Text (.txt)"
+  },
+  "contentMode": {
+    "label": "Content to Export:",
+    "translated": "Translated Text Only",
+    "source": "Original Text Only",
+    "dual": "Bilingual / Dual (Original + Translated)"
+  },
+  "options": {
+    "filenameLabel": "Output file name:",
+    "previewLabel": "Generated file preview:",
+    "linesCount": "{count} lines generated",
+    "fileSizeEst": "Estimated size: ~{size}"
+  },
+  "actions": {
+    "download": "Download File",
+    "copy": "Copy Content",
+    "copied": "Copied!",
+    "close": "Close"
+  }
+}

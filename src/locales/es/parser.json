@@ -1,0 +1,36 @@
+{
+  "dropzone": {
+    "title": "Arrastra y suelta tu archivo SRT aquí",
+    "subtitle": "o haz clic para explorar en tu equipo",
+    "support": "Compatible con archivos .srt estándar (UTF-8, saltos Windows CRLF o Unix LF)",
+    "loadedFile": "Archivo cargado",
+    "fileSize": "Tamaño",
+    "replaceFile": "Reemplazar archivo",
+    "samplePrompt": "¿No tienes un archivo a mano?"
+  },
+  "stats": {
+    "totalBlocks": "Bloques de Subtítulos",
+    "totalDuration": "Duración Total",
+    "totalCharacters": "Caracteres Totales",
+    "totalWords": "Palabras Totales",
+    "avgDuration": "Duración Promedio"
+  },
+  "preview": {
+    "title": "Vista Previa de Bloques",
+    "subtitle": "Validación en memoria y visualización de marcas de tiempo",
+    "searchPlaceholder": "Buscar por texto o número de bloque...",
+    "id": "N°",
+    "timing": "Intervalo de Tiempo",
+    "duration": "Duración",
+    "sourceText": "Texto Original",
+    "targetText": "Texto Traducido",
+    "status": "Estado",
+    "emptySource": "(Sin contenido de texto)",
+    "noResults": "No se encontraron bloques con el término de búsqueda ingresado.",
+    "noFileTitle": "Ningún archivo cargado",
+    "noFileDescription": "Sube un archivo .srt o pulsa en 'Cargar Ejemplo' para procesar y analizar los bloques en memoria.",
+    "showing": "Mostrando",
+    "of": "de",
+    "blocks": "bloques"
+  }
+}

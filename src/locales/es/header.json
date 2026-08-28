@@ -1,0 +1,15 @@
+{
+  "title": "Subtitle Wizard",
+  "tagline": "Procesamiento, validación y traducción de subtítulos 100% en el cliente",
+  "serverStatus": {
+    "label": "Servidor Local",
+    "pending": "Pendiente",
+    "connected": "Conectado",
+    "offline": "Desconectado"
+  },
+  "language": {
+    "label": "Idioma",
+    "es": "Español",
+    "en": "English"
+  }
+}

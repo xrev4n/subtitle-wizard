@@ -1,0 +1,47 @@
+{
+  "title": "LLM Server Configuration",
+  "subtitle": "Local connection and inference parameters for LM Studio / OpenAI-compatible API",
+  "tabs": {
+    "connection": "Connection & Model",
+    "parameters": "Inference Parameters",
+    "prompt": "System Prompt"
+  },
+  "connection": {
+    "endpointLabel": "Local Server Endpoint",
+    "endpointPlaceholder": "http://localhost:1234/v1",
+    "endpointHelp": "Base URL for the OpenAI-compatible API running in LM Studio, Ollama, or LocalAI.",
+    "testBtn": "Test Connection",
+    "testing": "Testing...",
+    "connected": "Connected",
+    "disconnected": "Disconnected",
+    "latency": "Latency",
+    "corsWarningTitle": "Connection or CORS issues?",
+    "corsWarningText": "Ensure LM Studio is running with Local Server active and that 'Enable CORS' is checked in LM Studio server settings.",
+    "modelLabel": "Active Model",
+    "modelPlaceholder": "Select a loaded model...",
+    "noModels": "No loaded models found on the server",
+    "refreshModels": "Refresh model list",
+    "testInferenceBtn": "Test Inference",
+    "testingInference": "Testing inference...",
+    "testInferenceSuccess": "Model test response received successfully:",
+    "testInferenceFailed": "Inference test failed"
+  },
+  "parameters": {
+    "temperatureLabel": "Temperature (Creativity)",
+    "temperatureHelp": "Lower values (0.1 - 0.3) provide more consistent, literal, and accurate translations.",
+    "batchSizeLabel": "Batch Size (Subtitles per request)",
+    "batchSizeHelp": "Number of subtitle cues processed in a single LLM request (recommended: 8 to 15).",
+    "maxTokensLabel": "Max Response Tokens",
+    "maxTokensHelp": "Maximum token limit for the model completion.",
+    "resetDefaults": "Reset to default parameters"
+  },
+  "prompt": {
+    "systemPromptLabel": "Base Translation System Prompt",
+    "systemPromptHelp": "Base instructions sent to the model to define its role, tone, and formatting constraints.",
+    "resetPromptBtn": "Reset Prompt to Default"
+  },
+  "actions": {
+    "save": "Save Settings",
+    "close": "Close"
+  }
+}

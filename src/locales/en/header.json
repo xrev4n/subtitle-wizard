@@ -1,0 +1,15 @@
+{
+  "title": "Subtitle Wizard",
+  "tagline": "100% Client-side subtitle parsing, validation and translation engine",
+  "serverStatus": {
+    "label": "Local Server",
+    "pending": "Pending",
+    "connected": "Connected",
+    "offline": "Offline"
+  },
+  "language": {
+    "label": "Language",
+    "es": "Español",
+    "en": "English"
+  }
+}

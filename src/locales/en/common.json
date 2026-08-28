@@ -1,0 +1,31 @@
+{
+  "actions": {
+    "upload": "Upload file",
+    "download": "Download SRT",
+    "copy": "Copy to clipboard",
+    "copied": "Copied!",
+    "clear": "Clear",
+    "sample": "Load Sample",
+    "search": "Search in subtitles...",
+    "filter": "Filter",
+    "close": "Close",
+    "export": "Export"
+  },
+  "status": {
+    "pending": "Pending",
+    "translated": "Translated",
+    "editing": "Editing",
+    "error": "Error"
+  },
+  "alerts": {
+    "invalidFile": "Please select a valid .srt file",
+    "emptyFile": "The selected file is empty or contains no valid subtitle cues",
+    "copiedSuccess": "SRT content copied to clipboard",
+    "downloadSuccess": "SRT file exported successfully"
+  },
+  "badges": {
+    "localOnly": "100% In-Memory",
+    "privacy": "Zero external servers",
+    "zeroCloud": "Complete Privacy"
+  }
+}

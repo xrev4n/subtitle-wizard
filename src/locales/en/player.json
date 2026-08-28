@@ -1,0 +1,41 @@
+{
+  "title": "Synchronized Local Player",
+  "subtitle": "Load local video or audio to preview subtitles in real time",
+  "loadMedia": "Load Video / Audio File",
+  "dropMediaPrompt": "Drag & drop video/audio here or click to browse",
+  "supportedFormats": "Supported formats: .mp4, .webm, .mkv, .mp3, .wav, .m4a",
+  "noActiveSubtitle": "No active subtitle at this timestamp",
+  "captionMode": {
+    "label": "Caption Mode:",
+    "translated": "Translated",
+    "source": "Original",
+    "dual": "Bilingual (Dual)",
+    "off": "Disabled"
+  },
+  "controls": {
+    "speed": "Speed",
+    "seekBack": "-5s",
+    "seekForward": "+5s",
+    "closePlayer": "Hide Player",
+    "openPlayer": "Media Player",
+    "removeMedia": "Remove video/audio"
+  },
+  "alerts": {
+    "localOnlyNotice": "100% Local: Media files are loaded directly in your browser and never uploaded."
+  },
+  "lyrics": {
+    "title": "Lyrics & Sync Editor",
+    "subtitle": "Live flowing subtitles with auto-scroll",
+    "autoScroll": "Auto-scroll",
+    "pausedForEditing": "Paused for editing",
+    "channel": "Channel",
+    "channels": {
+      "translated": "Translated",
+      "source": "Original",
+      "dual": "Bilingual"
+    },
+    "empty": "No subtitles available to synchronize",
+    "seekTo": "Jump video to this timestamp",
+    "clickToEdit": "Click to edit text directly"
+  }
+}

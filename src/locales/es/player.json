@@ -1,0 +1,41 @@
+{
+  "title": "Reproductor Local Sincronizado",
+  "subtitle": "Carga video o audio local para previsualizar subtítulos en tiempo real",
+  "loadMedia": "Cargar Archivo de Video / Audio",
+  "dropMediaPrompt": "Arrastra un video/audio aquí o haz clic para cargar",
+  "supportedFormats": "Formatos compatibles: .mp4, .webm, .mkv, .mp3, .wav, .m4a",
+  "noActiveSubtitle": "Sin subtítulo en este instante",
+  "captionMode": {
+    "label": "Modo de Subtítulo:",
+    "translated": "Traducido",
+    "source": "Original",
+    "dual": "Bilingüe (Dual)",
+    "off": "Desactivado"
+  },
+  "controls": {
+    "speed": "Velocidad",
+    "seekBack": "-5s",
+    "seekForward": "+5s",
+    "closePlayer": "Ocultar Reproductor",
+    "openPlayer": "Reproductor Multimedia",
+    "removeMedia": "Quitar video/audio"
+  },
+  "alerts": {
+    "localOnlyNotice": "100% Local: Tu video/audio se procesa en el navegador y nunca se sube a internet."
+  },
+  "lyrics": {
+    "title": "Letras & Editor Sincronizado",
+    "subtitle": "Flujo en vivo con desplazamiento automático",
+    "autoScroll": "Auto-scroll",
+    "pausedForEditing": "Pausado para editar",
+    "channel": "Canal",
+    "channels": {
+      "translated": "Traducido",
+      "source": "Original",
+      "dual": "Bilingüe"
+    },
+    "empty": "No hay subtítulos disponibles para sincronizar",
+    "seekTo": "Saltar video a este momento",
+    "clickToEdit": "Haz clic para editar texto directamente"
+  }
+}

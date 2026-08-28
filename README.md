@@ -1,0 +1,163 @@
+# Subtitle Wizard 🪄
+
+> **100% In-Memory, Client-Side Subtitle Processing, Interactive Editor, Spotify Lyrics Panel & AI Translation Platform**
+> 
+> *Optimized for AI Agents, Pair-Programming Assistants & Human Developers.*
+
+---
+
+## 🌟 Project Overview
+
+**Subtitle Wizard** is a modern, privacy-first web application designed to parse, validate, edit, timing-shift, synchronize, translate, and export `.srt`, `.vtt`, and `.ass` subtitle files entirely in client memory. All processing occurs locally within the browser, requiring **zero backend servers**, **zero cloud dependencies**, and guaranteeing complete data privacy.
+
+### Key Mission & Objectives
+- **Zero-Cloud & 100% Local**: No subtitle content, video, or audio ever leaves the user's browser.
+- **Local LLM Inference**: Direct browser-to-server HTTP communication with local OpenAI-compatible APIs (LM Studio, Ollama, LocalAI, vLLM).
+- **AI Batch Translation Engine**: Slices subtitle cues into configurable batches, enforces strict JSON structured output, and updates cues dynamically in memory with live telemetry.
+- **Interactive In-Memory Subtitle Editor**: In-place text and timestamp editing, cue insertion, cue splitting, adjacent merging, and non-destructive Undo support.
+- **Precision Timing Shift Tools**: Millisecond-accurate global, progressive, or selective time shifts with automatic zero clamping.
+- **Temporal Integrity Diagnostics**: Instant detection and visual flagging of cue overlaps, invalid durations (<100ms), and empty subtitle blocks.
+- **Synchronized Local Media Player**: Load local video or audio files with real-time styled live caption overlay and bidirectional click-to-seek navigation.
+- **Spotify Lyrics-Style Interactive Panel**: Real-time flowing subtitles on the right of the video featuring smooth auto-scroll to the active line, dimmed inactive cues, and in-place editing that automatically pauses media playback.
+- **Multi-Format Export Suite**: Export to canonical SubRip (`.srt`), WebVTT (`.vtt`), Advanced SubStation Alpha (`.ass`), and Plain Text (`.txt`) with Single (Translated/Source) or Bilingual Dual modes.
+- **Modular i18n**: Fully decoupled JSON internationalization system (Spanish / English) without external packages.
+- **Session Auto-Persistence**: Automatic local restoration of workspace state between browser reloads.
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology | Description |
+| :--- | :--- | :--- |
+| **UI Framework** | React 19 (`^19.2.8`) | Modern component architecture, functional hooks |
+| **Build Tool & Bundler** | Vite 8 (`^8.2.2`) | Ultra-fast HMR and production bundle optimization |
+| **Styling Engine** | Tailwind CSS v4 (`^4.3.3`) + `@tailwindcss/vite` | Modern `@import "tailwindcss";` without legacy configs |
+| **Iconography** | Lucide React (`^1.35.0`) | Clean, accessible SVG icons |
+| **Class Utilities** | `clsx` + `tailwind-merge` | Conditional and merged utility styling |
+| **Parser & Serializer** | Pure ES Modules (`src/utils/srtParser.js`) | Zero-dependency millisecond-accurate SRT parser |
+| **Timing & Integrity Engine** | Pure ES Modules (`src/utils/timingUtils.js`) | Time shifting, overlap validator, split, merge & insert |
+| **Multi-Format Exporters** | Pure ES Modules (`src/utils/exporters.js`) | SRT, WebVTT, ASS/SSA, Plain text & Bilingual dual |
+| **Local LLM Client** | Native `fetch` + `AbortController` (`src/services/llmService.js`) | Local OpenAI-compatible client for LM Studio / Ollama |
+| **Batch Translation Engine** | Custom Orchestrator (`src/hooks/useTranslationQueue.js` & `translationService.js`) | Strict JSON prompt schema, resilient parser & batch control |
+| **Local Media Player** | HTML5 Media API (`src/components/MediaSyncPlayer.jsx`) | Memory-safe `URL.createObjectURL` video/audio live sync |
+| **Spotify Lyrics Panel** | Custom Sync Engine (`src/components/LyricsSyncPanel.jsx`) | Smooth auto-scroll, auto-pause on focus, and channel viewing |
+| **Session Persistence** | Web Storage (`src/services/storageService.js`) | Automatic client-side project snapshot caching |
+
+---
+
+## 📁 Architecture & Directory Tree
+
+```
+subtitle-wizard/
+├── public/
+│   ├── favicon.svg
+│   └── icons.svg
+├── src/
+│   ├── assets/
+│   │   └── ...
+│   ├── components/
+│   │   ├── ExportModal.jsx               # Multi-format export dialog (.srt, .vtt, .ass, .txt, dual)
+│   │   ├── FileUploader.jsx              # Drag-and-drop & file picker with validation
+│   │   ├── Header.jsx                    # Brand header, server status, media player toggle & lang switcher
+│   │   ├── LyricsSyncPanel.jsx           # Spotify-style lyrics vertical flow, auto-scroll & auto-pause
+│   │   ├── MediaSyncPlayer.jsx           # Local video/audio player with live captions & 2-column layout
+│   │   ├── SettingsModal.jsx             # Local LLM connection, model selector & param tuning
+│   │   ├── StatsBar.jsx                  # Aggregate metrics summary cards (blocks, duration, words)
+│   │   ├── SubtitlePreview.jsx           # Dual comparative editor, search filter, export & row actions
+│   │   ├── TimingShiftModal.jsx          # Millisecond offset shifts, scope selection & presets
+│   │   ├── TranslationControlBar.jsx     # Language selectors, start, pause, resume & cancel controls
+│   │   └── TranslationProgressBar.jsx    # Live progress bar, batch telemetry, speed & ETA
+│   ├── context/
+│   │   ├── I18nContext.jsx               # Modular i18n Provider and useTranslation() hook
+│   │   └── SettingsContext.jsx           # Local LLM connection state, latency & parameters
+│   ├── hooks/
+│   │   └── useTranslationQueue.js        # Queue orchestrator, lifecycle state machine & telemetry
+│   ├── locales/
+│   │   ├── en/
+│   │   │   ├── common.json               # English actions, alerts, badges, status
+│   │   │   ├── editor.json               # English editor, shift modal, validation & actions
+│   │   │   ├── export.json               # English multi-format export copy & format labels
+│   │   │   ├── header.json               # English header and navigation labels
+│   │   │   ├── parser.json               # English dropzone, stats, preview labels
+│   │   │   ├── player.json               # English local media player & lyrics sync copy
+│   │   │   ├── settings.json             # English LLM settings, parameters & diagnostic copy
+│   │   │   └── translation.json          # English batch translation controls, progress & statuses
+│   │   └── es/
+│   │       ├── common.json               # Spanish actions, alerts, badges, status
+│   │       ├── editor.json               # Spanish editor, shift modal, validation & actions
+│   │       ├── export.json               # Spanish multi-format export copy & format labels
+│   │       ├── header.json               # Spanish header and navigation labels
+│   │       ├── parser.json               # Spanish dropzone, stats, preview labels
+│   │       ├── player.json               # Spanish local media player & lyrics sync copy
+│   │       ├── settings.json             # Spanish LLM settings, parameters & diagnostic copy
+│   │       └── translation.json          # Spanish batch translation controls, progress & statuses
+│   ├── services/
+│   │   ├── llmService.js                 # Native fetch client for /models and /chat/completions
+│   │   ├── storageService.js             # Client project session persistence (localStorage)
+│   │   └── translationService.js         # Prompt builder, resilient JSON extractor & batch translator
+│   ├── utils/
+│   │   ├── exporters.js                  # Multi-format converters (SRT, VTT, ASS, TXT, Dual)
+│   │   ├── srtParser.js                  # Core SRT parse, serialize, format & sample generator
+│   │   └── timingUtils.js                # Timing shift, integrity diagnostics, split, merge & insert
+│   ├── App.jsx                           # Root application component orchestrating states & undo stack
+│   ├── index.css                         # Tailwind CSS v4 core and glassmorphism styling
+│   └── main.jsx                          # React 19 DOM entry point
+├── eslint.config.js                      # ESLint configuration
+├── index.html                            # HTML5 entry with metadata
+├── package.json                          # Project manifest and scripts
+├── README.md                             # AI & developer documentation context
+└── vite.config.js                        # Vite + Tailwind v4 plugin configuration
+```
+
+---
+
+## 🎵 Spotify Lyrics Panel Specification
+
+### 1. Synchronized Vertical Flow & Auto-Scroll
+- **Active Line Glow**: Current speaking cue is styled with full opacity (`opacity-100`), vivid white/amber text, and an illuminated left border.
+- **Dimmed Context**: Inactive cues transition to `opacity-40` to focus the user's attention.
+- **Center Smooth Auto-Scroll**: `activeRowRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })` tracks playback without manual scrolling.
+- **User Override**: Auto-scroll can be toggled on/off with one click.
+
+### 2. In-Place Editing & Auto-Pause Trigger
+- **Auto-Pause**: Focusing (`onFocus`) or clicking on any lyric line to edit automatically pauses media playback if running, preventing the video from advancing while editing.
+- **Real-Time Memory Sync**: Typing immediately dispatches updates to the global `subtitles` state in memory, synchronizing the preview table, video caption overlay, and local persistence.
+- **Click-to-Seek**: Every row includes an instant play button (`▶`) to jump playback directly to that cue's `startMs`.
+
+---
+
+## 🚀 Status Tracker & Roadmap (100% MVP Completed)
+
+| Phase | Description | Status | Key Deliverables |
+| :---: | :--- | :---: | :--- |
+| **Phase 1** | **Core Architecture, In-Memory SRT Parser & Modular i18n** | ✅ **Completed** | React 19 + Tailwind CSS v4, i18n ES/EN context, `parseSRT`/`serializeSRT` engine, UI components (`Header`, `FileUploader`, `StatsBar`, `SubtitlePreview`), `README.md`. |
+| **Phase 2** | **Local LLM Server Integration & Diagnostic Module** | ✅ **Completed** | Native fetch `llmService.js` (/models, /chat/completions), `SettingsContext`, `SettingsModal`, live latency tracking, dynamic model discovery, test inference engine. |
+| **Phase 3** | **Batch Translation Engine & Queue Management** | ✅ **Completed** | `translationService.js` with strict JSON prompt schema & resilient parser, `useTranslationQueue.js` hook with pause/resume/cancel/retry, `TranslationControlBar`, `TranslationProgressBar`, dual comparative preview. |
+| **Phase 4** | **Interactive Subtitle Editor & Timing Shift Tools** | ✅ **Completed** | `timingUtils.js` (shift, split, merge, insert, delete, validate), `TimingShiftModal`, in-place editable cues, visual overlap diagnostics, undo history stack. |
+| **Phase 5** | **Multi-Format Export & Synchronized Media Player** | ✅ **Completed** | `exporters.js` (SRT, VTT, ASS, TXT, Dual), `ExportModal`, `MediaSyncPlayer` with live caption overlay and bidirectional click-to-seek, `LyricsSyncPanel` (Spotify Lyrics mode with auto-scroll & auto-pause), `storageService.js` session auto-saving. |
+
+---
+
+## 💻 Development & Execution
+
+```bash
+# Install dependencies
+npm install
+
+# Start Vite development server (with HMR)
+npm run dev
+
+# Run ESLint validation
+npm run lint
+
+# Build production bundle
+npm run build
+
+# Preview production build
+npm run preview
+```
+
+---
+
+## 🔒 Privacy & Security Guarantee
+This application executes 100% locally in the user's browser. All communication with LLMs is directed solely to user-authorized local host endpoints (such as `http://localhost:1234/v1`). No video, audio, or subtitle files are transmitted over external networks. Zero telemetry, zero analytics, and zero cloud lock-in.

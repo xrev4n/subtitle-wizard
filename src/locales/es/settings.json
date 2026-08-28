@@ -1,0 +1,47 @@
+{
+  "title": "Configuración del Servidor LLM",
+  "subtitle": "Conexión local y parámetros de inferencia para LM Studio / API compatible con OpenAI",
+  "tabs": {
+    "connection": "Conexión & Modelo",
+    "parameters": "Parámetros de Inferencia",
+    "prompt": "System Prompt"
+  },
+  "connection": {
+    "endpointLabel": "Endpoint del Servidor Local",
+    "endpointPlaceholder": "http://localhost:1234/v1",
+    "endpointHelp": "URL base de la API compatible con OpenAI en LM Studio, Ollama o LocalAI.",
+    "testBtn": "Probar Conexión",
+    "testing": "Probando...",
+    "connected": "Conectado",
+    "disconnected": "Desconectado",
+    "latency": "Latencia",
+    "corsWarningTitle": "¿Problemas de conexión o CORS?",
+    "corsWarningText": "Asegúrate de que LM Studio esté ejecutándose con el servidor local activo y que la opción 'CORS' esté habilitada en los ajustes del servidor local.",
+    "modelLabel": "Modelo Activo",
+    "modelPlaceholder": "Selecciona un modelo cargado...",
+    "noModels": "No se encontraron modelos cargados en el servidor",
+    "refreshModels": "Actualizar lista de modelos",
+    "testInferenceBtn": "Probar Inferencia",
+    "testingInference": "Enviando prueba...",
+    "testInferenceSuccess": "Respuesta del modelo recibida con éxito:",
+    "testInferenceFailed": "Error durante la inferencia de prueba"
+  },
+  "parameters": {
+    "temperatureLabel": "Temperatura (Creatividad)",
+    "temperatureHelp": "Valores bajos (0.1 - 0.3) garantizan traducciones más consistentes, literales y precisas.",
+    "batchSizeLabel": "Tamaño del Lote (Subtítulos por petición)",
+    "batchSizeHelp": "Cantidad de bloques de subtítulos procesados en una sola llamada al LLM (recomendado: 8 a 15).",
+    "maxTokensLabel": "Tokens Máximos por Respuesta",
+    "maxTokensHelp": "Límite de tokens en la respuesta del modelo.",
+    "resetDefaults": "Restablecer valores por defecto"
+  },
+  "prompt": {
+    "systemPromptLabel": "System Prompt Base para Traducción",
+    "systemPromptHelp": "Instrucciones base enviadas al modelo para definir el rol, tono y restricciones de formato en la traducción.",
+    "resetPromptBtn": "Restablecer Prompt por Defecto"
+  },
+  "actions": {
+    "save": "Guardar Configuración",
+    "close": "Cerrar"
+  }
+}

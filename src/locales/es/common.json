@@ -1,0 +1,31 @@
+{
+  "actions": {
+    "upload": "Subir archivo",
+    "download": "Descargar SRT",
+    "copy": "Copiar al portapapeles",
+    "copied": "¡Copiado!",
+    "clear": "Limpiar",
+    "sample": "Cargar Ejemplo",
+    "search": "Buscar en subtítulos...",
+    "filter": "Filtrar",
+    "close": "Cerrar",
+    "export": "Exportar"
+  },
+  "status": {
+    "pending": "Pendiente",
+    "translated": "Traducido",
+    "editing": "En edición",
+    "error": "Error"
+  },
+  "alerts": {
+    "invalidFile": "Por favor selecciona un archivo .srt válido",
+    "emptyFile": "El archivo seleccionado está vacío o no contiene bloques válidos",
+    "copiedSuccess": "Contenido SRT copiado al portapapeles",
+    "downloadSuccess": "Archivo SRT exportado exitosamente"
+  },
+  "badges": {
+    "localOnly": "100% En Memoria",
+    "privacy": "Sin servidores externos",
+    "zeroCloud": "Privacidad Total"
+  }
+}

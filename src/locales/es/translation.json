@@ -1,0 +1,56 @@
+{
+  "panelTitle": "Motor de Traducción IA por Lotes",
+  "panelSubtitle": "Orquestación en tiempo real con LM Studio",
+  "languages": {
+    "sourceLabel": "Idioma Origen",
+    "targetLabel": "Idioma Destino",
+    "auto": "Detección Automática",
+    "en": "Inglés (English)",
+    "es": "Español",
+    "fr": "Francés (Français)",
+    "de": "Alemán (Deutsch)",
+    "pt": "Portugués (Português)",
+    "it": "Italiano",
+    "ja": "Japonés (日本語)",
+    "zh": "Chino (中文)",
+    "ko": "Coreano (한국어)",
+    "ru": "Ruso (Русский)"
+  },
+  "controls": {
+    "start": "Iniciar Traducción",
+    "pause": "Pausar",
+    "resume": "Reanudar",
+    "cancel": "Cancelar",
+    "retryFailed": "Reintentar Fallidos",
+    "serverOffline": "El servidor local no está conectado. Abre Ajustes para conectarte."
+  },
+  "progress": {
+    "title": "Progreso de Traducción",
+    "batch": "Lote {current} de {total}",
+    "cuesCount": "{completed} de {total} subtítulos traducidos",
+    "speed": "{speed} bloques/s",
+    "eta": "Tiempo restante: ~{eta}",
+    "etaCalculating": "Calculando tiempo...",
+    "errorsCount": "{count} errores",
+    "status": {
+      "idle": "Listo para iniciar",
+      "translating": "Traduciendo lote...",
+      "paused": "Traducción pausada",
+      "completed": "¡Traducción completada!",
+      "error": "Pausado por errores"
+    }
+  },
+  "filters": {
+    "all": "Todos",
+    "translated": "Traducidos",
+    "pending": "Pendientes",
+    "translating": "En progreso",
+    "error": "Errores"
+  },
+  "cues": {
+    "retryCue": "Reintentar este bloque",
+    "translatingStatus": "Traduciendo...",
+    "errorStatus": "Error en traducción",
+    "translatedStatus": "Traducido"
+  }
+}

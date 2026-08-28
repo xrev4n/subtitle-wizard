@@ -1,0 +1,47 @@
+{
+  "title": "Editor & Sincronización Temporal",
+  "tools": "Herramientas de Tiempo",
+  "undo": "Deshacer",
+  "undoSuccess": "Última acción deshecha con éxito",
+  "actions": {
+    "addAfter": "Insertar bloque después",
+    "split": "Dividir bloque",
+    "mergeNext": "Fusionar con el siguiente",
+    "delete": "Eliminar bloque",
+    "shiftFromHere": "Desplazar desde aquí...",
+    "editCue": "Editar bloque",
+    "saveCue": "Guardar cambios",
+    "cancelEdit": "Cancelar edición"
+  },
+  "shiftModal": {
+    "title": "Desplazamiento Temporal de Subtítulos",
+    "subtitle": "Ajusta y sincroniza marcas de tiempo sumando o restando milisegundos",
+    "offsetLabel": "Desplazamiento en Milisegundos (+/- ms)",
+    "offsetPlaceholder": "+500 o -1000",
+    "presets": "Accesos Rápidos:",
+    "scopeLabel": "Alcance del Desplazamiento:",
+    "scopes": {
+      "all": "Todos los subtítulos ({count})",
+      "fromSelected": "Desde el subtítulo #{id} en adelante ({count})",
+      "selectedOnly": "Solo los subtítulos seleccionados ({count})"
+    },
+    "previewTitle": "Vista Previa del Impacto:",
+    "affectedCues": "{count} subtítulos afectados",
+    "timeRange": "Nuevo rango temporal:",
+    "applyBtn": "Aplicar Desplazamiento",
+    "close": "Cerrar",
+    "clampingNotice": "Los tiempos inferiores a 00:00:00,000 se ajustarán automáticamente a cero."
+  },
+  "validation": {
+    "integrityTitle": "Diagnóstico de Integridad",
+    "allValid": "Sin problemas de sincronización detectados",
+    "overlapWarning": "Solapamiento: se cruza {ms}ms con el bloque anterior",
+    "durationError": "Duración inválida: debe ser mayor a 100ms",
+    "emptyWarning": "Bloque sin contenido de texto",
+    "fixOverlap": "Ajustar solapamiento automáticamente"
+  },
+  "splitMerge": {
+    "splitSuccess": "Bloque dividido en 2 subtítulos",
+    "mergeSuccess": "Bloques fusionados exitosamente"
+  }
+}

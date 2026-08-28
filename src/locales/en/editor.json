@@ -1,0 +1,47 @@
+{
+  "title": "Editor & Timing Tools",
+  "tools": "Timing Tools",
+  "undo": "Undo",
+  "undoSuccess": "Last action undone successfully",
+  "actions": {
+    "addAfter": "Insert cue after",
+    "split": "Split cue",
+    "mergeNext": "Merge with next",
+    "delete": "Delete cue",
+    "shiftFromHere": "Shift from here...",
+    "editCue": "Edit cue",
+    "saveCue": "Save changes",
+    "cancelEdit": "Cancel edit"
+  },
+  "shiftModal": {
+    "title": "Subtitle Timing Shift",
+    "subtitle": "Adjust and sync timestamps by adding or subtracting milliseconds",
+    "offsetLabel": "Offset in Milliseconds (+/- ms)",
+    "offsetPlaceholder": "+500 or -1000",
+    "presets": "Quick Presets:",
+    "scopeLabel": "Shift Scope:",
+    "scopes": {
+      "all": "All subtitles ({count})",
+      "fromSelected": "From cue #{id} onwards ({count})",
+      "selectedOnly": "Selected subtitles only ({count})"
+    },
+    "previewTitle": "Impact Preview:",
+    "affectedCues": "{count} subtitles affected",
+    "timeRange": "New timing interval:",
+    "applyBtn": "Apply Timing Shift",
+    "close": "Close",
+    "clampingNotice": "Timestamps below 00:00:00,000 will be clamped to zero automatically."
+  },
+  "validation": {
+    "integrityTitle": "Timing Diagnostics",
+    "allValid": "No synchronization issues detected",
+    "overlapWarning": "Overlap: overlaps {ms}ms with previous cue",
+    "durationError": "Invalid duration: must be greater than 100ms",
+    "emptyWarning": "Empty cue text content",
+    "fixOverlap": "Auto-fix overlap"
+  },
+  "splitMerge": {
+    "splitSuccess": "Cue split into 2 subtitles",
+    "mergeSuccess": "Cues merged successfully"
+  }
+}
