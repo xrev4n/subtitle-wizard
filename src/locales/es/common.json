@@ -1,4 +1,13 @@
 {
+  "hero": {
+    "badge": "Espacio de Trabajo 100% en Memoria",
+    "title": "Subtitle Wizard",
+    "description": "Edición interactiva, sincronización en vivo, traducción IA por lotes con LM Studio local y exportación multiformato.",
+    "badges": {
+      "zeroCloud": "Sin Servidores",
+      "localLlm": "LLM Local"
+    }
+  },
   "actions": {
     "upload": "Subir archivo",
     "download": "Descargar SRT",
@@ -27,5 +36,12 @@
     "localOnly": "100% En Memoria",
     "privacy": "Sin servidores externos",
     "zeroCloud": "Privacidad Total"
+  },
+  "footer": {
+    "tagline": "Suite Minimalista de Subtitulado y Traducción en Memoria",
+    "localOnly": "Procesamiento 100% Local • Sin Servidores Externos",
+    "license": "Licencia CC0 1.0 (Dominio Público)",
+    "developedBy": "Desarrollado por",
+    "github": "GitHub"
   }
 }

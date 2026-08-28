@@ -3,6 +3,7 @@
   "tagline": "100% client-side subtitle processing, validation and AI translation",
   "actions": {
     "newProject": "New",
+    "newProjectConfirm": "Do you want to start a new project? Current subtitles will be cleared to load a new file.",
     "clearAll": "Clear All",
     "clearAllConfirm": "Are you sure you want to clear all data from memory? Subtitles, translations, and loaded media will be removed, resetting the workspace to its initial state."
   },

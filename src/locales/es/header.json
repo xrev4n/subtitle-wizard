@@ -3,6 +3,7 @@
   "tagline": "Procesamiento, validación y traducción de subtítulos 100% en el cliente",
   "actions": {
     "newProject": "Nuevo",
+    "newProjectConfirm": "¿Deseas iniciar un nuevo proyecto? Los subtítulos actuales se limpiarán para cargar un nuevo archivo.",
     "clearAll": "Borrar Todo",
     "clearAllConfirm": "¿Estás seguro de que deseas borrar todos los datos de memoria? Se eliminarán los subtítulos, traducciones y el video cargado, restableciendo la aplicación al estado inicial."
   },

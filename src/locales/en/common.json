@@ -1,4 +1,13 @@
 {
+  "hero": {
+    "badge": "100% In-Browser Memory Workspace",
+    "title": "Subtitle Wizard",
+    "description": "Interactive editing, live synchronization, AI batch translation with local LM Studio, and multi-format export.",
+    "badges": {
+      "zeroCloud": "Zero Cloud",
+      "localLlm": "Local LLM"
+    }
+  },
   "actions": {
     "upload": "Upload file",
     "download": "Download SRT",
@@ -27,5 +36,12 @@
     "localOnly": "100% In-Memory",
     "privacy": "Zero external servers",
     "zeroCloud": "Complete Privacy"
+  },
+  "footer": {
+    "tagline": "Minimalist In-Memory Subtitle & Translation Suite",
+    "localOnly": "100% Local Processing • Zero External Servers",
+    "license": "CC0 1.0 Universal (Public Domain)",
+    "developedBy": "Developed by",
+    "github": "GitHub"
   }
 }

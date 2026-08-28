@@ -25,7 +25,7 @@ import MediaSyncPlayer from './components/MediaSyncPlayer';
 import SettingsModal from './components/SettingsModal';
 import TimingShiftModal from './components/TimingShiftModal';
 import ExportModal from './components/ExportModal';
-import { Sparkles, Shield, Cpu, Zap } from 'lucide-react';
+import { Sparkles, Shield, Cpu, ExternalLink } from 'lucide-react';
 
 function SubtitleWizardApp() {
   const { t } = useTranslation();
@@ -106,9 +106,7 @@ function SubtitleWizardApp() {
 
   const handleNewProject = () => {
     if (subtitles.length > 0) {
-      const confirmed = window.confirm(
-        '¿Deseas iniciar un nuevo proyecto? Los subtítulos actuales se limpiarán para cargar un nuevo archivo.'
-      );
+      const confirmed = window.confirm(t('header.actions.newProjectConfirm'));
       if (!confirmed) return;
     }
     handleClear();
@@ -182,28 +180,24 @@ function SubtitleWizardApp() {
             <div className="text-center space-y-3">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">
                 <Sparkles className="w-3.5 h-3.5" />
-                <span>100% In-Browser Memory Workspace</span>
+                <span>{t('common.hero.badge')}</span>
               </div>
               <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white m-0">
-                Subtitle Wizard
+                {t('common.hero.title')}
               </h2>
               <p className="text-sm sm:text-base text-slate-400 max-w-xl mx-auto leading-relaxed m-0">
-                Edición interactiva, sincronización en vivo, traducción IA por lotes con LM Studio local y exportación multiformato.
+                {t('common.hero.description')}
               </p>
 
               {/* Feature Badges */}
               <div className="flex flex-wrap items-center justify-center gap-2.5 pt-2">
                 <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-900/80 border border-white/10 text-xs font-medium text-slate-300">
                   <Shield className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>Zero Cloud</span>
+                  <span>{t('common.hero.badges.zeroCloud')}</span>
                 </div>
                 <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-900/80 border border-white/10 text-xs font-medium text-slate-300">
                   <Cpu className="w-3.5 h-3.5 text-cyan-400" />
-                  <span>Local LLM</span>
-                </div>
-                <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-900/80 border border-white/10 text-xs font-medium text-slate-300">
-                  <Zap className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Spotify Lyrics Flow</span>
+                  <span>{t('common.hero.badges.localLlm')}</span>
                 </div>
               </div>
             </div>
@@ -286,14 +280,49 @@ function SubtitleWizardApp() {
       />
 
       {/* Minimal Footer */}
-      <footer className="border-t border-white/5 py-5 mt-10 bg-slate-950/40 text-center text-xs text-slate-500">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <div>
-            <span className="font-semibold text-slate-400">Subtitle Wizard</span> • Minimalist In-Memory Subtitle & Translation Suite
+      <footer className="border-t border-white/5 py-6 mt-10 bg-slate-950/40 text-xs text-slate-500">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
+          
+          {/* Left: Product & Tagline */}
+          <div className="flex flex-col sm:flex-row items-center gap-2 text-center sm:text-left">
+            <span className="font-semibold text-slate-300">Subtitle Wizard</span>
+            <span className="hidden sm:inline text-slate-600">•</span>
+            <span className="text-slate-400">{t('common.footer.tagline')}</span>
           </div>
-          <div>
-            100% Local Processing • Zero External Servers
+
+          {/* Center & Right: CC0 License & GitHub Profile */}
+          <div className="flex flex-wrap items-center justify-center gap-4 text-center">
+            {/* CC0 Public Domain Badge / Link */}
+            <a
+              href="https://creativecommons.org/publicdomain/zero/1.0/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-900/80 hover:bg-slate-800 border border-white/10 text-slate-400 hover:text-slate-200 transition-colors text-[11px] font-medium"
+              title="Creative Commons Zero v1.0 Universal - Dominio Público"
+            >
+              <span className="font-bold text-slate-300">CC0</span>
+              <span>{t('common.footer.license')}</span>
+            </a>
+
+            {/* Author GitHub Link */}
+            <a
+              href="https://github.com/xrev4n"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-900/80 hover:bg-slate-800 border border-white/10 text-slate-300 hover:text-white transition-colors text-[11px] font-medium group"
+              title="GitHub: xrev4n"
+            >
+              <svg
+                className="w-3.5 h-3.5 fill-slate-400 group-hover:fill-white transition-colors"
+                viewBox="0 0 24 24"
+              >
+                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+              </svg>
+              <span>xrev4n</span>
+              <ExternalLink className="w-3 h-3 text-slate-500 group-hover:text-slate-300 transition-colors" />
+            </a>
           </div>
+
         </div>
       </footer>
     </div>
