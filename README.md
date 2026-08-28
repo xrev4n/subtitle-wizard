@@ -24,7 +24,7 @@
 ## 🌐 Live Demo / Demostración en Vivo
 
 🚀 **Try Subtitle Wizard directly in your browser:**  
-**[https://subtitle-wizard.vercel.app](https://YOUR_VERCEL_PROJECT_NAME.vercel.app)**
+**[https://subtitle-wizard.vercel.app/](https://subtitle-wizard.vercel.app/)**
 
 ---
 
