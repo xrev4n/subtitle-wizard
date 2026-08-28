@@ -8,10 +8,13 @@
     "clearAllConfirm": "Are you sure you want to clear all data from memory? Subtitles, translations, and loaded media will be removed, resetting the workspace to its initial state."
   },
   "serverStatus": {
-    "label": "Local Server",
+    "label": "LLM Provider",
     "pending": "Pending",
     "connected": "Connected",
-    "offline": "Offline"
+    "offline": "Offline",
+    "noKey": "No API Key",
+    "lmstudio": "LM Studio",
+    "openrouter": "OpenRouter"
   },
   "language": {
     "label": "Language",

@@ -1,6 +1,6 @@
 {
   "panelTitle": "Motor de Traducción IA por Lotes",
-  "panelSubtitle": "Orquestación en tiempo real con LM Studio",
+  "panelSubtitle": "Orquestación en tiempo real con LM Studio u OpenRouter",
   "languages": {
     "sourceLabel": "Idioma Origen",
     "targetLabel": "Idioma Destino",
@@ -22,7 +22,7 @@
     "resume": "Reanudar",
     "cancel": "Cancelar",
     "retryFailed": "Reintentar Fallidos",
-    "serverOffline": "El servidor local no está conectado. Abre Ajustes para conectarte."
+    "serverOffline": "El proveedor LLM no está conectado. Abre Ajustes para conectarte o ingresar tu API Key."
   },
   "progress": {
     "title": "Progreso de Traducción",

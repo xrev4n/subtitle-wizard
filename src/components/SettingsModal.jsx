@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from '../context/I18nContext';
 import { useSettings, DEFAULT_SETTINGS, DEFAULT_SYSTEM_PROMPT } from '../context/SettingsContext';
+import { OPENROUTER_POPULAR_MODELS } from '../services/llmService';
 import {
   X,
   Server,
@@ -10,11 +11,15 @@ import {
   RefreshCw,
   Play,
   CheckCircle2,
-  AlertTriangle,
   HelpCircle,
   RotateCcw,
   Sparkles,
   Zap,
+  Cloud,
+  Eye,
+  EyeOff,
+  ExternalLink,
+  ShieldCheck,
 } from 'lucide-react';
 
 export default function SettingsModal() {
@@ -33,7 +38,11 @@ export default function SettingsModal() {
   } = useSettings();
 
   const [activeTab, setActiveTab] = useState('connection'); // 'connection' | 'parameters' | 'prompt'
-  const [localEndpoint, setLocalEndpoint] = useState(settings.endpoint);
+  const [provider, setProvider] = useState(settings.provider || 'lmstudio');
+  const [localEndpoint, setLocalEndpoint] = useState(settings.endpoint || 'http://localhost:1234/v1');
+  const [openRouterKey, setOpenRouterKey] = useState(settings.openRouterKey || '');
+  const [showApiKey, setShowApiKey] = useState(false);
+  const [selectedModel, setSelectedModel] = useState(settings.selectedModel || '');
   const [isTestingConn, setIsTestingConn] = useState(false);
   const [isTestingInference, setIsTestingInference] = useState(false);
   const [inferenceResult, setInferenceResult] = useState(null);
@@ -51,21 +60,52 @@ export default function SettingsModal() {
 
   if (!isSettingsOpen) return null;
 
+  const handleProviderSwitch = (newProvider) => {
+    setProvider(newProvider);
+    let newModel = selectedModel;
+    if (newProvider === 'openrouter' && (!newModel || !newModel.includes('/'))) {
+      newModel = 'deepseek/deepseek-chat';
+      setSelectedModel(newModel);
+    }
+    updateSettings({
+      provider: newProvider,
+      selectedModel: newModel,
+    });
+  };
+
   const handleTestConnection = async () => {
     setIsTestingConn(true);
-    updateSettings({ endpoint: localEndpoint });
-    await testServerConnection(localEndpoint);
+    const updated = {
+      provider,
+      endpoint: localEndpoint,
+      openRouterKey,
+      selectedModel,
+    };
+    updateSettings(updated);
+    await testServerConnection(updated);
     setIsTestingConn(false);
   };
 
   const handleTestInference = async () => {
     setIsTestingInference(true);
     setInferenceResult(null);
+    const updated = {
+      provider,
+      endpoint: localEndpoint,
+      openRouterKey,
+      selectedModel,
+    };
+    updateSettings(updated);
     const res = await executeInferenceTest(
       'Translate to Spanish: "Hello, welcome to Subtitle Wizard. Enjoy fast in-browser translation!"'
     );
     setInferenceResult(res);
     setIsTestingInference(false);
+  };
+
+  const handleSelectPopularModel = (modelId) => {
+    setSelectedModel(modelId);
+    updateSettings({ selectedModel: modelId });
   };
 
   const handleResetParams = () => {
@@ -82,19 +122,29 @@ export default function SettingsModal() {
     });
   };
 
+  const handleSave = () => {
+    updateSettings({
+      provider,
+      endpoint: localEndpoint,
+      openRouterKey,
+      selectedModel,
+    });
+    setIsSettingsOpen(false);
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/75 backdrop-blur-md animate-fadeIn">
       {/* Modal Dialog Container */}
       <div className="relative w-full max-w-2xl bg-slate-900 border border-white/15 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
         
         {/* Modal Header */}
-        <div className="px-6 py-5 border-b border-white/10 flex items-center justify-between bg-slate-900/90">
+        <div className="px-6 py-4.5 border-b border-white/10 flex items-center justify-between bg-slate-900/90">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
-              <Server className="w-5 h-5" />
+              {provider === 'openrouter' ? <Cloud className="w-5 h-5" /> : <Server className="w-5 h-5" />}
             </div>
             <div>
-              <h2 className="text-lg font-bold text-white m-0 p-0 leading-tight">
+              <h2 className="text-base sm:text-lg font-bold text-white m-0 p-0 leading-tight">
                 {t('settings.title')}
               </h2>
               <p className="text-xs text-slate-400 mt-0.5 m-0 p-0">
@@ -157,72 +207,206 @@ export default function SettingsModal() {
         {/* Modal Body */}
         <div className="p-6 overflow-y-auto space-y-6 flex-1 text-left">
           
-          {/* TAB 1: CONNECTION & MODEL */}
+          {/* TAB 1: CONNECTION, PROVIDER & MODEL */}
           {activeTab === 'connection' && (
             <div className="space-y-6">
               
-              {/* Endpoint Input & Test Button */}
+              {/* Provider Selection Segmented Switch */}
               <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold text-slate-300">
-                    {t('settings.connection.endpointLabel')}
-                  </label>
-                  {serverStatus === 'connected' && (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
-                      <CheckCircle2 className="w-3 h-3" />
-                      {t('settings.connection.connected')} ({latencyMs}ms)
-                    </span>
-                  )}
-                  {serverStatus === 'error' && (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-rose-500/10 text-rose-300 border border-rose-500/20">
-                      <AlertTriangle className="w-3 h-3" />
-                      {t('settings.connection.disconnected')}
-                    </span>
-                  )}
-                </div>
+                <label className="text-xs font-semibold text-slate-300">
+                  {t('settings.provider.label')}
+                </label>
 
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={localEndpoint}
-                    onChange={(e) => setLocalEndpoint(e.target.value)}
-                    placeholder={t('settings.connection.endpointPlaceholder')}
-                    className="flex-1 px-3.5 py-2 text-sm bg-slate-950 border border-white/10 rounded-xl text-white font-mono focus:outline-none focus:border-indigo-500 transition-colors"
-                  />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  
+                  {/* Option A: LM Studio */}
                   <button
                     type="button"
-                    disabled={isTestingConn}
-                    onClick={handleTestConnection}
-                    className="px-4 py-2 text-xs font-semibold rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white disabled:opacity-50 transition-all flex items-center gap-2 flex-shrink-0 cursor-pointer"
+                    onClick={() => handleProviderSwitch('lmstudio')}
+                    className={`p-3 rounded-2xl border text-left transition-all flex items-start gap-3 cursor-pointer ${
+                      provider === 'lmstudio'
+                        ? 'bg-indigo-600/15 border-indigo-500 text-white ring-1 ring-indigo-500/50'
+                        : 'bg-slate-950/60 border-white/10 text-slate-400 hover:bg-slate-950 hover:text-slate-200'
+                    }`}
                   >
-                    <RefreshCw className={`w-3.5 h-3.5 ${isTestingConn ? 'animate-spin' : ''}`} />
-                    {isTestingConn ? t('settings.connection.testing') : t('settings.connection.testBtn')}
+                    <div className={`p-2 rounded-xl border ${provider === 'lmstudio' ? 'bg-indigo-600 text-white border-indigo-400' : 'bg-slate-900 text-slate-400 border-white/10'}`}>
+                      <Server className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-slate-100 flex items-center gap-1.5">
+                        <span>{t('settings.provider.lmstudio')}</span>
+                        {provider === 'lmstudio' && <span className="w-2 h-2 rounded-full bg-indigo-400"></span>}
+                      </div>
+                      <p className="text-[11px] text-slate-400 mt-0.5 leading-tight">
+                        {t('settings.provider.lmstudioDesc')}
+                      </p>
+                    </div>
                   </button>
+
+                  {/* Option B: OpenRouter */}
+                  <button
+                    type="button"
+                    onClick={() => handleProviderSwitch('openrouter')}
+                    className={`p-3 rounded-2xl border text-left transition-all flex items-start gap-3 cursor-pointer ${
+                      provider === 'openrouter'
+                        ? 'bg-purple-600/15 border-purple-500 text-white ring-1 ring-purple-500/50'
+                        : 'bg-slate-950/60 border-white/10 text-slate-400 hover:bg-slate-950 hover:text-slate-200'
+                    }`}
+                  >
+                    <div className={`p-2 rounded-xl border ${provider === 'openrouter' ? 'bg-purple-600 text-white border-purple-400' : 'bg-slate-900 text-slate-400 border-white/10'}`}>
+                      <Cloud className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-slate-100 flex items-center gap-1.5">
+                        <span>{t('settings.provider.openrouter')}</span>
+                        {provider === 'openrouter' && <span className="w-2 h-2 rounded-full bg-purple-400"></span>}
+                      </div>
+                      <p className="text-[11px] text-slate-400 mt-0.5 leading-tight">
+                        {t('settings.provider.openrouterDesc')}
+                      </p>
+                    </div>
+                  </button>
+
                 </div>
-                <p className="text-[11px] text-slate-500">
-                  {t('settings.connection.endpointHelp')}
-                </p>
               </div>
 
-              {/* Error & CORS Warning Box */}
-              {serverStatus === 'error' && (
-                <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-200 text-xs space-y-2">
-                  <div className="flex items-center gap-2 font-semibold text-amber-300">
-                    <HelpCircle className="w-4 h-4 flex-shrink-0" />
-                    <span>{t('settings.connection.corsWarningTitle')}</span>
+              {/* LM Studio Specific Settings */}
+              {provider === 'lmstudio' && (
+                <div className="space-y-3 p-4 rounded-2xl bg-slate-950/60 border border-white/10">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-semibold text-slate-300">
+                      {t('settings.connection.endpointLabel')}
+                    </label>
+                    {serverStatus === 'connected' && (
+                      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
+                        <CheckCircle2 className="w-3 h-3" />
+                        {t('settings.connection.connected')} ({latencyMs}ms)
+                      </span>
+                    )}
                   </div>
-                  <p className="text-slate-300 leading-relaxed">
-                    {t('settings.connection.corsWarningText')}
+
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={localEndpoint}
+                      onChange={(e) => setLocalEndpoint(e.target.value)}
+                      placeholder={t('settings.connection.endpointPlaceholder')}
+                      className="flex-1 px-3.5 py-2 text-sm bg-slate-900 border border-white/10 rounded-xl text-white font-mono focus:outline-none focus:border-indigo-500 transition-colors"
+                    />
+                    <button
+                      type="button"
+                      disabled={isTestingConn}
+                      onClick={handleTestConnection}
+                      className="px-3.5 py-2 text-xs font-semibold rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white disabled:opacity-50 transition-all flex items-center gap-2 flex-shrink-0 cursor-pointer"
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 ${isTestingConn ? 'animate-spin' : ''}`} />
+                      <span>{isTestingConn ? t('settings.connection.testing') : t('settings.connection.testBtn')}</span>
+                    </button>
+                  </div>
+                  <p className="text-[11px] text-slate-500">
+                    {t('settings.connection.endpointHelp')}
                   </p>
-                  {connectionError && (
-                    <div className="p-2.5 bg-slate-950/70 rounded-lg text-rose-300 font-mono text-[11px] border border-rose-500/20">
-                      {connectionError}
+
+                  {/* CORS Warning Box */}
+                  {serverStatus === 'error' && (
+                    <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-200 text-xs space-y-1.5">
+                      <div className="flex items-center gap-2 font-semibold text-amber-300">
+                        <HelpCircle className="w-3.5 h-3.5 flex-shrink-0" />
+                        <span>{t('settings.connection.corsWarningTitle')}</span>
+                      </div>
+                      <p className="text-slate-300 leading-relaxed text-[11px]">
+                        {t('settings.connection.corsWarningText')}
+                      </p>
+                      {connectionError && (
+                        <div className="p-2 bg-slate-950/70 rounded text-rose-300 font-mono text-[10px] border border-rose-500/20">
+                          {connectionError}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
               )}
 
-              {/* Model Dropdown & Refresh */}
+              {/* OpenRouter Specific Settings */}
+              {provider === 'openrouter' && (
+                <div className="space-y-3 p-4 rounded-2xl bg-slate-950/60 border border-purple-500/20">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-semibold text-purple-200 flex items-center gap-1.5">
+                      <span>{t('settings.openrouter.apiKeyLabel')}</span>
+                    </label>
+                    <a
+                      href="https://openrouter.ai/keys"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-purple-400 hover:text-purple-300 flex items-center gap-1 font-medium transition-colors"
+                    >
+                      <span>{t('settings.openrouter.getKeyLink')}</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <input
+                        type={showApiKey ? 'text' : 'password'}
+                        value={openRouterKey}
+                        onChange={(e) => setOpenRouterKey(e.target.value)}
+                        placeholder={t('settings.openrouter.apiKeyPlaceholder')}
+                        className="w-full px-3.5 py-2 pr-10 text-sm bg-slate-900 border border-white/10 rounded-xl text-white font-mono focus:outline-none focus:border-purple-500 transition-colors"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowApiKey(!showApiKey)}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white cursor-pointer p-1"
+                        title={showApiKey ? 'Ocultar clave' : 'Mostrar clave'}
+                      >
+                        {showApiKey ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                      </button>
+                    </div>
+
+                    <button
+                      type="button"
+                      disabled={isTestingConn || !openRouterKey.trim()}
+                      onClick={handleTestConnection}
+                      className="px-3.5 py-2 text-xs font-semibold rounded-xl bg-purple-600 hover:bg-purple-500 text-white disabled:opacity-40 transition-all flex items-center gap-2 flex-shrink-0 cursor-pointer"
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 ${isTestingConn ? 'animate-spin' : ''}`} />
+                      <span>{isTestingConn ? t('settings.connection.testing') : t('settings.connection.testBtn')}</span>
+                    </button>
+                  </div>
+
+                  {/* BYOK Privacy notice */}
+                  <div className="flex items-center gap-2 p-2.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-200 text-[11px]">
+                    <ShieldCheck className="w-4 h-4 text-purple-400 flex-shrink-0" />
+                    <span>{t('settings.openrouter.apiKeyHelp')}</span>
+                  </div>
+
+                  {/* Popular Model Presets Pills */}
+                  <div className="space-y-1.5 pt-1">
+                    <label className="text-[11px] font-semibold text-slate-400">
+                      {t('settings.openrouter.popularModels')}:
+                    </label>
+                    <div className="flex flex-wrap gap-1.5">
+                      {OPENROUTER_POPULAR_MODELS.map((m) => (
+                        <button
+                          key={m.id}
+                          type="button"
+                          onClick={() => handleSelectPopularModel(m.id)}
+                          className={`px-2.5 py-1 rounded-lg text-[11px] font-mono border transition-all cursor-pointer ${
+                            selectedModel === m.id
+                              ? 'bg-purple-600 text-white border-purple-400 shadow-sm'
+                              : 'bg-slate-900 text-slate-300 border-white/10 hover:border-purple-400/50 hover:bg-slate-800'
+                          }`}
+                        >
+                          {m.name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Model Dropdown & Custom Model Input */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-semibold text-slate-300">
@@ -238,35 +422,48 @@ export default function SettingsModal() {
                   </button>
                 </div>
 
-                {availableModels.length > 0 ? (
-                  <select
-                    value={settings.selectedModel}
-                    onChange={(e) => updateSettings({ selectedModel: e.target.value })}
-                    className="w-full px-3.5 py-2.5 text-sm bg-slate-950 border border-white/10 rounded-xl text-white focus:outline-none focus:border-indigo-500 transition-colors font-mono cursor-pointer"
-                  >
-                    {availableModels.map((modelId) => (
-                      <option key={modelId} value={modelId}>
-                        {modelId}
-                      </option>
-                    ))}
-                  </select>
-                ) : (
-                  <div className="p-3 bg-slate-950/60 border border-dashed border-white/10 rounded-xl text-xs text-slate-400 text-center">
-                    {t('settings.connection.noModels')}
-                  </div>
-                )}
+                <div className="space-y-2">
+                  <input
+                    type="text"
+                    value={selectedModel}
+                    onChange={(e) => {
+                      setSelectedModel(e.target.value);
+                      updateSettings({ selectedModel: e.target.value });
+                    }}
+                    placeholder={provider === 'openrouter' ? t('settings.openrouter.customModelPlaceholder') : t('settings.connection.modelPlaceholder')}
+                    className="w-full px-3.5 py-2 text-sm bg-slate-950 border border-white/10 rounded-xl text-white font-mono focus:outline-none focus:border-indigo-500 transition-colors"
+                  />
+
+                  {availableModels.length > 0 && (
+                    <select
+                      value={selectedModel}
+                      onChange={(e) => {
+                        setSelectedModel(e.target.value);
+                        updateSettings({ selectedModel: e.target.value });
+                      }}
+                      className="w-full px-3 py-2 text-xs bg-slate-950/80 border border-white/10 rounded-xl text-slate-300 focus:outline-none focus:border-indigo-500 transition-colors font-mono cursor-pointer"
+                    >
+                      <option value="">-- Seleccionar de la lista ({availableModels.length} disponibles) --</option>
+                      {availableModels.map((modelId) => (
+                        <option key={modelId} value={modelId} className="bg-slate-900 text-white">
+                          {modelId}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </div>
               </div>
 
-              {/* Inference Test Button & Live Output */}
+              {/* Diagnostic Test Inference Section */}
               <div className="p-4 rounded-2xl bg-slate-950/60 border border-white/10 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Zap className="w-4 h-4 text-amber-400" />
-                    <span className="text-xs font-semibold text-white">Diagnostic Inference Test</span>
+                    <span className="text-xs font-semibold text-white">Prueba de Inferencia Diagnóstica</span>
                   </div>
                   <button
                     type="button"
-                    disabled={isTestingInference || serverStatus !== 'connected'}
+                    disabled={isTestingInference || (provider === 'openrouter' && !openRouterKey.trim())}
                     onClick={handleTestInference}
                     className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-white/10 disabled:opacity-40 transition-all flex items-center gap-1.5 cursor-pointer"
                   >
@@ -447,10 +644,7 @@ export default function SettingsModal() {
             </button>
             <button
               type="button"
-              onClick={() => {
-                updateSettings({ endpoint: localEndpoint });
-                setIsSettingsOpen(false);
-              }}
+              onClick={handleSave}
               className="px-4 py-2 text-xs font-semibold rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/30 transition-all cursor-pointer"
             >
               {t('settings.actions.save')}

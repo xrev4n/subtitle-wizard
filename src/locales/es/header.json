@@ -8,10 +8,13 @@
     "clearAllConfirm": "¿Estás seguro de que deseas borrar todos los datos de memoria? Se eliminarán los subtítulos, traducciones y el video cargado, restableciendo la aplicación al estado inicial."
   },
   "serverStatus": {
-    "label": "Servidor Local",
+    "label": "Proveedor LLM",
     "pending": "Pendiente",
     "connected": "Conectado",
-    "offline": "Desconectado"
+    "offline": "Desconectado",
+    "noKey": "Sin API Key",
+    "lmstudio": "LM Studio",
+    "openrouter": "OpenRouter"
   },
   "language": {
     "label": "Idioma",

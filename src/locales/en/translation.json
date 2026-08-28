@@ -1,10 +1,10 @@
 {
   "panelTitle": "AI Batch Translation Engine",
-  "panelSubtitle": "Real-time orchestration powered by LM Studio",
+  "panelSubtitle": "Real-time orchestration with LM Studio or OpenRouter",
   "languages": {
     "sourceLabel": "Source Language",
     "targetLabel": "Target Language",
-    "auto": "Auto-Detect",
+    "auto": "Auto Detect",
     "en": "English",
     "es": "Spanish (Español)",
     "fr": "French (Français)",
@@ -22,7 +22,7 @@
     "resume": "Resume",
     "cancel": "Cancel",
     "retryFailed": "Retry Failed",
-    "serverOffline": "Local server is not connected. Open Settings to connect."
+    "serverOffline": "LLM provider is disconnected. Open Settings to connect or enter your API Key."
   },
   "progress": {
     "title": "Translation Progress",
@@ -30,21 +30,21 @@
     "cuesCount": "{completed} of {total} subtitles translated",
     "speed": "{speed} cues/s",
     "eta": "Time remaining: ~{eta}",
-    "etaCalculating": "Calculating ETA...",
+    "etaCalculating": "Estimating time...",
     "errorsCount": "{count} errors",
     "status": {
-      "idle": "Ready to translate",
+      "idle": "Ready to start",
       "translating": "Translating batch...",
       "paused": "Translation paused",
       "completed": "Translation completed!",
-      "error": "Paused on errors"
+      "error": "Paused due to errors"
     }
   },
   "filters": {
     "all": "All",
     "translated": "Translated",
     "pending": "Pending",
-    "translating": "In Progress",
+    "translating": "In progress",
     "error": "Errors"
   },
   "cues": {

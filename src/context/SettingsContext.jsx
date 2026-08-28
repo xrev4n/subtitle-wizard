@@ -1,6 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
-import { checkConnection, testInference } from '../services/llmService';
+import { checkConnection, testInference, OPENROUTER_POPULAR_MODELS } from '../services/llmService';
 
 const SETTINGS_STORAGE_KEY = 'subtitle_wizard_settings';
 
@@ -8,7 +8,9 @@ export const DEFAULT_SYSTEM_PROMPT =
   'You are a professional subtitle translator. Translate the given subtitle lines accurately preserving nuance, timing tone, and formatting without omitting any block.';
 
 export const DEFAULT_SETTINGS = {
+  provider: 'lmstudio', // 'lmstudio' | 'openrouter'
   endpoint: 'http://localhost:1234/v1',
+  openRouterKey: '',
   selectedModel: '',
   temperature: 0.3,
   maxTokens: 2048,
@@ -60,14 +62,17 @@ export function SettingsProvider({ children }) {
     }
   }, []);
 
-  // Test connection to endpoint
+  // Test connection to endpoint / provider
   const testServerConnection = useCallback(
-    async (overrideEndpoint) => {
-      const targetEndpoint = overrideEndpoint || settings.endpoint;
+    async (overrideSettings) => {
+      const targetSettings = overrideSettings
+        ? { ...settings, ...(typeof overrideSettings === 'object' ? overrideSettings : { endpoint: overrideSettings }) }
+        : settings;
+
       setServerStatus('connecting');
       setConnectionError('');
 
-      const result = await checkConnection(targetEndpoint, 6000);
+      const result = await checkConnection(targetSettings, 6000);
 
       if (result.ok) {
         setServerStatus('connected');
@@ -76,10 +81,14 @@ export function SettingsProvider({ children }) {
         setConnectionError('');
 
         // Auto-select first model if none or previous not in list
-        if (result.models.length > 0) {
+        if (result.models && result.models.length > 0) {
           setSettings((prev) => {
             const hasModel = result.models.includes(prev.selectedModel);
-            const modelToUse = hasModel ? prev.selectedModel : result.models[0];
+            const modelToUse = hasModel
+              ? prev.selectedModel
+              : prev.provider === 'openrouter'
+              ? 'deepseek/deepseek-chat'
+              : result.models[0];
             const updated = { ...prev, selectedModel: modelToUse };
             try {
               localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(updated));
@@ -94,10 +103,13 @@ export function SettingsProvider({ children }) {
         setServerStatus('error');
         setLatencyMs(result.latencyMs);
         setConnectionError(result.error || 'Connection failed');
+        if (result.models && result.models.length > 0) {
+          setAvailableModels(result.models);
+        }
         return result;
       }
     },
-    [settings.endpoint]
+    [settings]
   );
 
   // Test inference
@@ -108,12 +120,14 @@ export function SettingsProvider({ children }) {
     [settings]
   );
 
-  // Check initial connection on mount using async lifecycle
+  // Check initial connection on mount or provider/endpoint change
+  const { provider, endpoint, openRouterKey } = settings;
+
   useEffect(() => {
     let ignore = false;
 
     async function checkInitialServer() {
-      const result = await checkConnection(settings.endpoint, 6000);
+      const result = await checkConnection({ provider, endpoint, openRouterKey }, 6000);
       if (ignore) return;
 
       if (result.ok) {
@@ -121,10 +135,11 @@ export function SettingsProvider({ children }) {
         setLatencyMs(result.latencyMs);
         setAvailableModels(result.models);
         setConnectionError('');
-        if (result.models.length > 0) {
+        if (result.models && result.models.length > 0) {
           setSettings((prev) => {
             const hasModel = result.models.includes(prev.selectedModel);
-            const modelToUse = hasModel ? prev.selectedModel : result.models[0];
+            const defaultM = prev.provider === 'openrouter' ? 'deepseek/deepseek-chat' : result.models[0];
+            const modelToUse = hasModel ? prev.selectedModel : defaultM;
             return { ...prev, selectedModel: modelToUse };
           });
         }
@@ -132,6 +147,9 @@ export function SettingsProvider({ children }) {
         setServerStatus('error');
         setLatencyMs(result.latencyMs);
         setConnectionError(result.error || 'Connection failed');
+        if (provider === 'openrouter') {
+          setAvailableModels(OPENROUTER_POPULAR_MODELS.map((m) => m.id));
+        }
       }
     }
 
@@ -140,7 +158,7 @@ export function SettingsProvider({ children }) {
     return () => {
       ignore = true;
     };
-  }, [settings.endpoint]);
+  }, [provider, endpoint, openRouterKey]);
 
   const value = useMemo(
     () => ({

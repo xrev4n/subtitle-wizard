@@ -1,10 +1,25 @@
 {
-  "title": "LLM Server Configuration",
-  "subtitle": "Local connection and inference parameters for LM Studio / OpenAI-compatible API",
+  "title": "LLM Provider Configuration",
+  "subtitle": "Choose between 100% local inference (LM Studio) or cloud API (OpenRouter BYOK)",
+  "provider": {
+    "label": "Inference Provider",
+    "lmstudio": "LM Studio (Local Server)",
+    "lmstudioDesc": "100% Private and Offline on your machine",
+    "openrouter": "OpenRouter (Cloud API / BYOK)",
+    "openrouterDesc": "Access DeepSeek, Claude, Gemini, Llama with your own API key"
+  },
   "tabs": {
-    "connection": "Connection & Model",
+    "connection": "Provider & Model",
     "parameters": "Inference Parameters",
     "prompt": "System Prompt"
+  },
+  "openrouter": {
+    "apiKeyLabel": "OpenRouter API Key",
+    "apiKeyPlaceholder": "sk-or-v1-xxxxxxxx...",
+    "apiKeyHelp": "Your key is stored exclusively in your browser (localStorage). It is never sent to intermediate servers.",
+    "getKeyLink": "Get API Key at openrouter.ai/keys",
+    "popularModels": "Popular Models",
+    "customModelPlaceholder": "Or type a model ID (e.g., deepseek/deepseek-chat)..."
   },
   "connection": {
     "endpointLabel": "Local Server Endpoint",
@@ -18,8 +33,8 @@
     "corsWarningTitle": "Connection or CORS issues?",
     "corsWarningText": "Ensure LM Studio is running with Local Server active and that 'Enable CORS' is checked in LM Studio server settings.",
     "modelLabel": "Active Model",
-    "modelPlaceholder": "Select a loaded model...",
-    "noModels": "No loaded models found on the server",
+    "modelPlaceholder": "Select or search a model...",
+    "noModels": "No available models found",
     "refreshModels": "Refresh model list",
     "testInferenceBtn": "Test Inference",
     "testingInference": "Testing inference...",

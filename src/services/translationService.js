@@ -1,11 +1,11 @@
 /**
  * AI Batch Translation Service
- * Optimized for LM Studio & OpenAI-compatible local APIs.
+ * Optimized for LM Studio & OpenRouter (Cloud BYOK).
  * Includes strict JSON prompt engineering, resilient multiline JSON sanitization,
  * 1:1 cue integrity validation, and automatic 1x1 micro-batching fallback.
  */
 
-import { normalizeEndpoint } from './llmService';
+import { getProviderConfig } from './llmService';
 
 export const SUPPORTED_LANGUAGES = [
   { code: 'es', name: 'Spanish', nativeName: 'Español' },
@@ -205,8 +205,8 @@ Output:
  * Translates a single cue directly (used for 1x1 micro-batching fallback).
  */
 async function translateSingleCueDirectly({ cue, sourceLang, targetLang, settings, signal }) {
-  const base = normalizeEndpoint(settings.endpoint);
-  const url = `${base}/chat/completions`;
+  const { baseUrl, headers, defaultModel } = getProviderConfig(settings);
+  const url = `${baseUrl}/chat/completions`;
 
   const { systemMessage, userMessage } = buildTranslationPrompt({
     cues: [cue],
@@ -216,7 +216,7 @@ async function translateSingleCueDirectly({ cue, sourceLang, targetLang, setting
   });
 
   const payload = {
-    model: settings.selectedModel || 'default',
+    model: settings.selectedModel || defaultModel,
     messages: [
       { role: 'system', content: systemMessage },
       { role: 'user', content: userMessage },
@@ -228,10 +228,7 @@ async function translateSingleCueDirectly({ cue, sourceLang, targetLang, setting
 
   const response = await fetch(url, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    },
+    headers,
     body: JSON.stringify(payload),
     signal,
   });
@@ -273,7 +270,7 @@ export function validateBatchIntegrity(cues, translations) {
 }
 
 /**
- * Translates a batch of subtitle cues using the local LLM endpoint.
+ * Translates a batch of subtitle cues using LM Studio or OpenRouter.
  * Automatically validates 1:1 ID alignment and falls back to 1x1 micro-batching
  * if dialogue splitting or ID desynchronization occurs.
  *
@@ -290,8 +287,8 @@ export async function translateBatch({ cues, sourceLang, targetLang, settings, s
     return { ok: true, translations: {}, latencyMs: 0 };
   }
 
-  const base = normalizeEndpoint(settings.endpoint);
-  const url = `${base}/chat/completions`;
+  const { baseUrl, headers, defaultModel } = getProviderConfig(settings);
+  const url = `${baseUrl}/chat/completions`;
 
   const { systemMessage, userMessage } = buildTranslationPrompt({
     cues,
@@ -301,7 +298,7 @@ export async function translateBatch({ cues, sourceLang, targetLang, settings, s
   });
 
   const payload = {
-    model: settings.selectedModel || 'default',
+    model: settings.selectedModel || defaultModel,
     messages: [
       { role: 'system', content: systemMessage },
       { role: 'user', content: userMessage },
@@ -316,10 +313,7 @@ export async function translateBatch({ cues, sourceLang, targetLang, settings, s
   try {
     const response = await fetch(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
+      headers,
       body: JSON.stringify(payload),
       signal,
     });
@@ -348,7 +342,7 @@ export async function translateBatch({ cues, sourceLang, targetLang, settings, s
     }
 
     // If 1:1 validation fails (e.g. model split dialogue hyphens into extra IDs or missed IDs),
-    // trigger 1x1 micro-batching fallback to guarantee mathematically exact alignment!
+    // trigger 1x1 micro-batching fallback to guarantee exact alignment!
     console.warn(
       `[TranslationService] Batch 1:1 integrity check failed for ${cues.length} cues. Falling back to 1x1 micro-batching.`
     );
@@ -390,7 +384,7 @@ export async function translateBatch({ cues, sourceLang, targetLang, settings, s
       };
     }
 
-    // If batch request failed entirely, attempt 1x1 micro-batching fallback before giving up
+    // If batch request failed, attempt 1x1 micro-batching fallback before reporting total error
     if (cues.length > 1) {
       console.warn(
         `[TranslationService] Primary batch failed (${err.message}). Attempting 1x1 micro-batching fallback.`
