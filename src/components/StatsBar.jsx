@@ -66,7 +66,7 @@ export default function StatsBar({ subtitles = [] }) {
         return (
           <div
             key={item.id}
-            className="glass-card rounded-xl p-4 border border-white/10 flex flex-col justify-between hover:border-white/20 transition-all group"
+            className="glass-card rounded-2xl p-4 flex flex-col justify-between hover:border-white/20 transition-all group"
           >
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs text-slate-400 font-medium line-clamp-1">

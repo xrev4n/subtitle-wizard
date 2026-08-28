@@ -1,7 +1,10 @@
 {
-  "title": "Synchronized Local Player",
-  "subtitle": "Load local video or audio to preview subtitles in real time",
-  "loadMedia": "Load Video / Audio File",
+  "title": "Media Studio & Synchronization",
+  "subtitle": "Preview subtitles in real time with local video/audio",
+  "loadMedia": "Load Video / Audio",
+  "changeMedia": "Change media",
+  "canvasPreview": "Preview Canvas Stage",
+  "noMediaPrompt": "Canvas stage mode (no video attached)",
   "dropMediaPrompt": "Drag & drop video/audio here or click to browse",
   "supportedFormats": "Supported formats: .mp4, .webm, .mkv, .mp3, .wav, .m4a",
   "noActiveSubtitle": "No active subtitle at this timestamp",
@@ -9,7 +12,7 @@
     "label": "Caption Mode:",
     "translated": "Translated",
     "source": "Original",
-    "dual": "Bilingual (Dual)",
+    "dual": "Bilingual",
     "off": "Disabled"
   },
   "controls": {
@@ -24,7 +27,7 @@
     "localOnlyNotice": "100% Local: Media files are loaded directly in your browser and never uploaded."
   },
   "lyrics": {
-    "title": "Lyrics & Sync Editor",
+    "title": "Lyrics & Sync Stream",
     "subtitle": "Live flowing subtitles with auto-scroll",
     "autoScroll": "Auto-scroll",
     "pausedForEditing": "Paused for editing",

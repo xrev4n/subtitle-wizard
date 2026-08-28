@@ -1,7 +1,10 @@
 {
-  "title": "Reproductor Local Sincronizado",
-  "subtitle": "Carga video o audio local para previsualizar subtítulos en tiempo real",
-  "loadMedia": "Cargar Archivo de Video / Audio",
+  "title": "Estudio Multimedia & Sincronización",
+  "subtitle": "Previsualiza subtítulos en tiempo real con video/audio local",
+  "loadMedia": "Cargar Video / Audio",
+  "changeMedia": "Cambiar archivo",
+  "canvasPreview": "Lienzo de Previsualización",
+  "noMediaPrompt": "Reproducción en modo lienzo (sin video adjunto)",
   "dropMediaPrompt": "Arrastra un video/audio aquí o haz clic para cargar",
   "supportedFormats": "Formatos compatibles: .mp4, .webm, .mkv, .mp3, .wav, .m4a",
   "noActiveSubtitle": "Sin subtítulo en este instante",
@@ -9,7 +12,7 @@
     "label": "Modo de Subtítulo:",
     "translated": "Traducido",
     "source": "Original",
-    "dual": "Bilingüe (Dual)",
+    "dual": "Bilingüe",
     "off": "Desactivado"
   },
   "controls": {
@@ -21,10 +24,10 @@
     "removeMedia": "Quitar video/audio"
   },
   "alerts": {
-    "localOnlyNotice": "100% Local: Tu video/audio se procesa en el navegador y nunca se sube a internet."
+    "localOnlyNotice": "100% Local: El video se procesa en el navegador y nunca se sube a internet."
   },
   "lyrics": {
-    "title": "Letras & Editor Sincronizado",
+    "title": "Letras & Flujo Sincronizado",
     "subtitle": "Flujo en vivo con desplazamiento automático",
     "autoScroll": "Auto-scroll",
     "pausedForEditing": "Pausado para editar",

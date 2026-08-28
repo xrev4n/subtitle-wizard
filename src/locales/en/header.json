@@ -1,6 +1,11 @@
 {
   "title": "Subtitle Wizard",
-  "tagline": "100% Client-side subtitle parsing, validation and translation engine",
+  "tagline": "100% client-side subtitle processing, validation and AI translation",
+  "actions": {
+    "newProject": "New",
+    "clearAll": "Clear All",
+    "clearAllConfirm": "Are you sure you want to clear all data from memory? Subtitles, translations, and loaded media will be removed, resetting the workspace to its initial state."
+  },
   "serverStatus": {
     "label": "Local Server",
     "pending": "Pending",

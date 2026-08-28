@@ -1,6 +1,6 @@
 # Subtitle Wizard 🪄
 
-> **100% In-Memory, Client-Side Subtitle Processing, Interactive Editor, Spotify Lyrics Panel & AI Translation Platform**
+> **100% In-Memory, Client-Side Subtitle Processing, Interactive Editor, Spotify Lyrics Studio & AI Translation Platform**
 > 
 > *Optimized for AI Agents, Pair-Programming Assistants & Human Developers.*
 
@@ -12,12 +12,12 @@
 
 ### Key Mission & Objectives
 - **Zero-Cloud & 100% Local**: No subtitle content, video, or audio ever leaves the user's browser.
+- **Unified Workspace & Always-On Studio**: An elegant, continuous interface where the Media Stage (Video or Dark Canvas Preview) and the Spotify Lyrics/Live Editor coexist side-by-side.
 - **Local LLM Inference**: Direct browser-to-server HTTP communication with local OpenAI-compatible APIs (LM Studio, Ollama, LocalAI, vLLM).
 - **AI Batch Translation Engine**: Slices subtitle cues into configurable batches, enforces strict JSON structured output, and updates cues dynamically in memory with live telemetry.
 - **Interactive In-Memory Subtitle Editor**: In-place text and timestamp editing, cue insertion, cue splitting, adjacent merging, and non-destructive Undo support.
 - **Precision Timing Shift Tools**: Millisecond-accurate global, progressive, or selective time shifts with automatic zero clamping.
 - **Temporal Integrity Diagnostics**: Instant detection and visual flagging of cue overlaps, invalid durations (<100ms), and empty subtitle blocks.
-- **Synchronized Local Media Player**: Load local video or audio files with real-time styled live caption overlay and bidirectional click-to-seek navigation.
 - **Spotify Lyrics-Style Interactive Panel**: Real-time flowing subtitles on the right of the video featuring smooth auto-scroll to the active line, dimmed inactive cues, and in-place editing that automatically pauses media playback.
 - **Multi-Format Export Suite**: Export to canonical SubRip (`.srt`), WebVTT (`.vtt`), Advanced SubStation Alpha (`.ass`), and Plain Text (`.txt`) with Single (Translated/Source) or Bilingual Dual modes.
 - **Modular i18n**: Fully decoupled JSON internationalization system (Spanish / English) without external packages.
@@ -39,7 +39,7 @@
 | **Multi-Format Exporters** | Pure ES Modules (`src/utils/exporters.js`) | SRT, WebVTT, ASS/SSA, Plain text & Bilingual dual |
 | **Local LLM Client** | Native `fetch` + `AbortController` (`src/services/llmService.js`) | Local OpenAI-compatible client for LM Studio / Ollama |
 | **Batch Translation Engine** | Custom Orchestrator (`src/hooks/useTranslationQueue.js` & `translationService.js`) | Strict JSON prompt schema, resilient parser & batch control |
-| **Local Media Player** | HTML5 Media API (`src/components/MediaSyncPlayer.jsx`) | Memory-safe `URL.createObjectURL` video/audio live sync |
+| **Local Media Player** | HTML5 Media API (`src/components/MediaSyncPlayer.jsx`) | Memory-safe `URL.createObjectURL` video/audio live sync & canvas stage |
 | **Spotify Lyrics Panel** | Custom Sync Engine (`src/components/LyricsSyncPanel.jsx`) | Smooth auto-scroll, auto-pause on focus, and channel viewing |
 | **Session Persistence** | Web Storage (`src/services/storageService.js`) | Automatic client-side project snapshot caching |
 
@@ -57,15 +57,15 @@ subtitle-wizard/
 │   │   └── ...
 │   ├── components/
 │   │   ├── ExportModal.jsx               # Multi-format export dialog (.srt, .vtt, .ass, .txt, dual)
-│   │   ├── FileUploader.jsx              # Drag-and-drop & file picker with validation
-│   │   ├── Header.jsx                    # Brand header, server status, media player toggle & lang switcher
+│   │   ├── FileUploader.jsx              # Minimalist landing dropzone with sample loader
+│   │   ├── Header.jsx                    # Refined top bar with LM Studio latency badge & quick actions
 │   │   ├── LyricsSyncPanel.jsx           # Spotify-style lyrics vertical flow, auto-scroll & auto-pause
-│   │   ├── MediaSyncPlayer.jsx           # Local video/audio player with live captions & 2-column layout
+│   │   ├── MediaSyncPlayer.jsx           # Always-on 2-column Media Studio (Video/Canvas + Lyrics)
 │   │   ├── SettingsModal.jsx             # Local LLM connection, model selector & param tuning
 │   │   ├── StatsBar.jsx                  # Aggregate metrics summary cards (blocks, duration, words)
-│   │   ├── SubtitlePreview.jsx           # Dual comparative editor, search filter, export & row actions
+│   │   ├── SubtitlePreview.jsx           # Detailed table editor, search filter, export & row actions
 │   │   ├── TimingShiftModal.jsx          # Millisecond offset shifts, scope selection & presets
-│   │   ├── TranslationControlBar.jsx     # Language selectors, start, pause, resume & cancel controls
+│   │   ├── TranslationControlBar.jsx     # Streamlined language selectors, start, pause, resume & cancel
 │   │   └── TranslationProgressBar.jsx    # Live progress bar, batch telemetry, speed & ETA
 │   ├── context/
 │   │   ├── I18nContext.jsx               # Modular i18n Provider and useTranslation() hook
@@ -99,7 +99,7 @@ subtitle-wizard/
 │   │   ├── exporters.js                  # Multi-format converters (SRT, VTT, ASS, TXT, Dual)
 │   │   ├── srtParser.js                  # Core SRT parse, serialize, format & sample generator
 │   │   └── timingUtils.js                # Timing shift, integrity diagnostics, split, merge & insert
-│   ├── App.jsx                           # Root application component orchestrating states & undo stack
+│   ├── App.jsx                           # Root application orchestrating the unified workspace
 │   ├── index.css                         # Tailwind CSS v4 core and glassmorphism styling
 │   └── main.jsx                          # React 19 DOM entry point
 ├── eslint.config.js                      # ESLint configuration
@@ -108,21 +108,6 @@ subtitle-wizard/
 ├── README.md                             # AI & developer documentation context
 └── vite.config.js                        # Vite + Tailwind v4 plugin configuration
 ```
-
----
-
-## 🎵 Spotify Lyrics Panel Specification
-
-### 1. Synchronized Vertical Flow & Auto-Scroll
-- **Active Line Glow**: Current speaking cue is styled with full opacity (`opacity-100`), vivid white/amber text, and an illuminated left border.
-- **Dimmed Context**: Inactive cues transition to `opacity-40` to focus the user's attention.
-- **Center Smooth Auto-Scroll**: `activeRowRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })` tracks playback without manual scrolling.
-- **User Override**: Auto-scroll can be toggled on/off with one click.
-
-### 2. In-Place Editing & Auto-Pause Trigger
-- **Auto-Pause**: Focusing (`onFocus`) or clicking on any lyric line to edit automatically pauses media playback if running, preventing the video from advancing while editing.
-- **Real-Time Memory Sync**: Typing immediately dispatches updates to the global `subtitles` state in memory, synchronizing the preview table, video caption overlay, and local persistence.
-- **Click-to-Seek**: Every row includes an instant play button (`▶`) to jump playback directly to that cue's `startMs`.
 
 ---
 
@@ -135,6 +120,7 @@ subtitle-wizard/
 | **Phase 3** | **Batch Translation Engine & Queue Management** | ✅ **Completed** | `translationService.js` with strict JSON prompt schema & resilient parser, `useTranslationQueue.js` hook with pause/resume/cancel/retry, `TranslationControlBar`, `TranslationProgressBar`, dual comparative preview. |
 | **Phase 4** | **Interactive Subtitle Editor & Timing Shift Tools** | ✅ **Completed** | `timingUtils.js` (shift, split, merge, insert, delete, validate), `TimingShiftModal`, in-place editable cues, visual overlap diagnostics, undo history stack. |
 | **Phase 5** | **Multi-Format Export & Synchronized Media Player** | ✅ **Completed** | `exporters.js` (SRT, VTT, ASS, TXT, Dual), `ExportModal`, `MediaSyncPlayer` with live caption overlay and bidirectional click-to-seek, `LyricsSyncPanel` (Spotify Lyrics mode with auto-scroll & auto-pause), `storageService.js` session auto-saving. |
+| **UX Refinement** | **Unified Minimalist Workspace** | ✅ **Completed** | Always-on 2-column Media Studio (Video/Canvas stage + Spotify Lyrics), streamlined toolbar, zero clutter, unified single-view workflow. |
 
 ---
 

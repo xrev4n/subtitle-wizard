@@ -1,6 +1,11 @@
 {
   "title": "Subtitle Wizard",
   "tagline": "Procesamiento, validación y traducción de subtítulos 100% en el cliente",
+  "actions": {
+    "newProject": "Nuevo",
+    "clearAll": "Borrar Todo",
+    "clearAllConfirm": "¿Estás seguro de que deseas borrar todos los datos de memoria? Se eliminarán los subtítulos, traducciones y el video cargado, restableciendo la aplicación al estado inicial."
+  },
   "serverStatus": {
     "label": "Servidor Local",
     "pending": "Pendiente",
