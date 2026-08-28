@@ -1,222 +1,248 @@
-# Subtitle Wizard 🪄
+<p align="center">
+  <img src="src/assets/logo/sw-textlogo.png" alt="Subtitle Wizard Logo" width="480" />
+</p>
 
-> **100% In-Memory, Client-Side Subtitle Processing, Interactive Editor, Spotify Lyrics Studio, AI Translation & Universal Media Subtitle Extractor**
-> 
-> *Optimized for AI Agents, Pair-Programming Assistants & Human Developers.*
+<p align="center">
+  <strong>100% Client-Side Subtitle Processing, Interactive Editor, Spotify Lyrics Studio, AI Translation & Universal Media Extractor</strong>
+</p>
 
----
+<p align="center">
+  <a href="https://creativecommons.org/publicdomain/zero/1.0/"><img src="https://img.shields.io/badge/License-CC0_1.0_Universal-blue.svg?style=flat-square" alt="License: CC0-1.0" /></a>
+  <img src="https://img.shields.io/badge/React-19.2-61DAFB?style=flat-square&logo=react&logoColor=black" alt="React 19" />
+  <img src="https://img.shields.io/badge/Vite-8.2-646CFF?style=flat-square&logo=vite&logoColor=white" alt="Vite 8" />
+  <img src="https://img.shields.io/badge/Tailwind_CSS-v4.3-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white" alt="Tailwind CSS v4" />
+  <img src="https://img.shields.io/badge/Privacy-100%25_In--Browser-success?style=flat-square" alt="100% In-Browser" />
+  <img src="https://img.shields.io/badge/Inference-LM_Studio_%7C_OpenRouter-purple?style=flat-square" alt="LM Studio & OpenRouter" />
+</p>
 
-## 🌟 Project Overview
-
-**Subtitle Wizard** is a modern, privacy-first web application designed to parse, extract, validate, edit, timing-shift, synchronize, translate, and export `.srt`, `.vtt`, and `.ass` subtitle files entirely in client memory. All processing occurs locally within the browser, requiring **zero backend servers**, **zero intermediate proxies**, and guaranteeing complete user privacy.
-
-### Key Mission & Objectives
-- **Zero-Cloud & 100% In-Browser Execution**: All subtitle parsing, editing, waveform sync, container inspection, and state management run in client memory without external server persistence.
-- **Universal Media Subtitle Extractor & Demuxer**: Inspects video/audio containers (`.mkv`, `.webm`, `.mp4`, `.mov`, `.m4v`) in browser memory via binary EBML / ISO Box parsing, identifies all embedded subtitle tracks, and converts selected tracks directly into editable `.srt` format.
-- **Dual LLM Provider Architecture (LM Studio & OpenRouter)**:
-  - **LM Studio (Local / Private)**: 100% offline inference on your own hardware via local endpoints (`http://localhost:1234/v1`).
-  - **OpenRouter (Cloud API / BYOK)**: Access DeepSeek V3/R1, Claude 3.5 Sonnet, Gemini 2.0 Flash, Llama 3.3 70B, GPT-4o Mini and more using your own OpenRouter API key stored safely in browser `localStorage`.
-- **Unified Workspace & Always-On Studio**: An elegant, continuous interface where the Media Stage (Video or Dark Canvas Preview) and the Spotify Lyrics/Live Editor coexist side-by-side.
-- **AI Batch Translation Engine with 1:1 ID Guarantee**: Slices subtitle cues into configurable batches, enforces strict JSON structured output, preserves multi-speaker dialogues (`- Speaker 1\n- Speaker 2`), validates 1:1 cue ID integrity, and automatically degrades to 1x1 micro-batching to prevent off-by-one errors.
-- **Interactive In-Memory Subtitle Editor**: In-place text and timestamp editing, cue insertion, cue splitting, adjacent merging, and non-destructive Undo support.
-- **Precision Timing Shift Tools**: Millisecond-accurate global, progressive, or selective time shifts with automatic zero clamping.
-- **Temporal Integrity Diagnostics**: Instant detection and visual flagging of cue overlaps, invalid durations (<100ms), and empty subtitle blocks.
-- **Spotify Lyrics-Style Interactive Panel**: Real-time flowing subtitles on the right of the video featuring smooth auto-scroll to the active line, dimmed inactive cues, and in-place editing that automatically pauses media playback.
-- **Multi-Format Export Suite**: Export to canonical SubRip (`.srt`), WebVTT (`.vtt`), Advanced SubStation Alpha (`.ass`), and Plain Text (`.txt`) with Single (Translated/Source) or Bilingual Dual modes.
-- **Modular i18n**: Fully decoupled JSON internationalization system (Spanish / English) without external packages.
-- **Session Auto-Persistence & Memory Wipe**: Automatic local restoration of workspace state between browser reloads, with a 1-click "Borrar Todo" memory cleaner.
+<p align="center">
+  <a href="#-english">English</a> • <a href="#-español">Español</a> • <a href="#-live-demo">Live Demo</a> • <a href="#-getting-started">Getting Started</a> • <a href="#-contributing">Contributing</a>
+</p>
 
 ---
 
-## 🛠️ Tech Stack
+## 🌐 Live Demo / Demostración en Vivo
 
-| Layer | Technology | Description |
-| :--- | :--- | :--- |
-| **UI Framework** | React 19 (`^19.2.8`) | Modern component architecture, functional hooks |
-| **Build Tool & Bundler** | Vite 8 (`^8.2.2`) | Ultra-fast HMR and production bundle optimization |
-| **Styling Engine** | Tailwind CSS v4 (`^4.3.3`) + `@tailwindcss/vite` | Modern `@import "tailwindcss";` without legacy configs |
-| **Iconography** | Lucide React (`^1.35.0`) | Clean, accessible SVG icons |
-| **Class Utilities** | `clsx` + `tailwind-merge` | Conditional and merged utility styling |
-| **Universal Media Extractor** | Pure ES Modules (`src/services/mediaExtractorService.js`) | In-browser EBML & MP4 atom demuxer for embedded subtitles |
-| **Parser & Serializer** | Pure ES Modules (`src/utils/srtParser.js`) | Zero-dependency millisecond-accurate SRT parser |
-| **Timing & Integrity Engine** | Pure ES Modules (`src/utils/timingUtils.js`) | Time shifting, overlap validator, split, merge & insert |
-| **Multi-Format Exporters** | Pure ES Modules (`src/utils/exporters.js`) | SRT, WebVTT, ASS/SSA, Plain text & Bilingual dual |
-| **Dual LLM Client** | Native `fetch` + `AbortController` (`src/services/llmService.js`) | Dual provider client supporting LM Studio and OpenRouter BYOK |
-| **Batch Translation Engine** | Custom Orchestrator (`src/hooks/useTranslationQueue.js` & `translationService.js`) | 1:1 ID validator, multi-speaker dialogue prompt, and 1x1 micro-batch fallback |
-| **Local Media Player** | HTML5 Media API (`src/components/MediaSyncPlayer.jsx`) | Memory-safe `URL.createObjectURL` video/audio live sync & pitch-black canvas stage |
-| **Spotify Lyrics Panel** | Custom Sync Engine (`src/components/LyricsSyncPanel.jsx`) | Smooth auto-scroll, auto-pause on focus, and channel viewing |
-| **Session Persistence** | Web Storage (`src/services/storageService.js`) | Automatic client-side project snapshot caching & wipe |
+🚀 **Try Subtitle Wizard directly in your browser:**  
+**[https://subtitle-wizard.vercel.app](https://YOUR_VERCEL_PROJECT_NAME.vercel.app)**
 
 ---
 
-## 📦 Universal In-Memory Subtitle Extraction Matrix
+# 🇬🇧 English
 
-```mermaid
-graph TD
-    UserDrop[User Drops File(s)] --> DropType{File Type Detection}
-    
-    DropType -->|Subtitle File (.srt, .vtt, .ass)| SubConverter[convertSubtitleToSRT]
-    DropType -->|Video Container (.mkv, .webm, .mp4, .mov)| MediaInspector[detectSubtitleTracks]
-    DropType -->|Multi-Drop: Video + Subtitle| MultiLoad[Load Video to Player & Subtitles to Editor]
-    
-    MediaInspector --> HasTracks{Tracks Found?}
-    HasTracks -->|Yes| Modal[TrackSelectorModal\nLanguage, Format, Title, Bitmap Filter]
-    HasTracks -->|No| InitStage[Load Video into Media Studio]
-    
-    Modal --> UserSelect[User Selects Track]
-    UserSelect --> Extractor[extractTrackAsSRT\nEBML / ISO Box Demuxer]
-    Extractor --> SubConverter
-    SubConverter --> Workspace[Mount in Unified Workspace & Editor]
-```
+## 🌟 About Subtitle Wizard
 
-### Supported Media Containers & Subtitle Codecs
+**Subtitle Wizard** is a modern, privacy-first web application designed to parse, extract, validate, edit, timing-shift, synchronize, translate with AI, and export `.srt`, `.vtt`, and `.ass` subtitles entirely in client memory.
 
-| Container Format | Subtitle Codec ID | Extraction Support | Output Format |
-| :--- | :--- | :---: | :--- |
-| **Matroska (`.mkv`)** | `S_TEXT/UTF8` (SRT) | ✅ **Full Text** | Canonical `.srt` |
-| **Matroska (`.mkv`)** | `S_TEXT/ASS` / `S_TEXT/SSA` | ✅ **Full Text** | Sanitized `.srt` |
-| **Matroska (`.mkv`)** | `S_TEXT/WEBVTT` | ✅ **Full Text** | Canonical `.srt` |
-| **Matroska (`.mkv`)** | `S_HDMV/PGS` (Bluray Bitmap) | ⚠️ Flagged (Image) | Detected & Informative Badge |
-| **Matroska (`.mkv`)** | `S_VOBSUB` (DVD Bitmap) | ⚠️ Flagged (Image) | Detected & Informative Badge |
-| **WebM (`.webm`)** | `D_WEBVTT/SUBTITLES` | ✅ **Full Text** | Canonical `.srt` |
-| **MP4 / MOV (`.mp4`, `.mov`, `.m4v`)** | `tx3g` / `text` (QuickTime Timed Text) | ✅ **Full Text** | Canonical `.srt` |
-| **MP4 / MOV (`.mp4`, `.mov`, `.m4v`)** | `wvtt` (WebVTT in MP4) | ✅ **Full Text** | Canonical `.srt` |
-| **Standalone Subtitles** | `.srt`, `.vtt`, `.ass`, `.ssa` | ✅ **Full Text** | Canonical `.srt` |
+Everything runs locally in your web browser: **zero backend servers**, **zero intermediate proxies**, and complete user privacy for your multimedia content.
 
 ---
 
-## 🤖 Dual LLM Provider Architecture (LM Studio & OpenRouter BYOK)
+### ✨ Key Features
 
-```mermaid
-graph TD
-    App[Subtitle Wizard UI] --> Queue[useTranslationQueue]
-    Queue --> Engine[translationService.js]
-    
-    Engine --> ProviderRouter{Provider Config}
-    
-    ProviderRouter -->|provider: 'lmstudio'| LMStudio[LM Studio / Local Server\nhttp://localhost:1234/v1\n100% Offline & Private]
-    ProviderRouter -->|provider: 'openrouter'| OpenRouter[OpenRouter API\nhttps://openrouter.ai/api/v1\nDirect Browser-to-Cloud with Bearer Token]
-    
-    LMStudio --> Parser[extractAndParseJSON\n1:1 ID Validation]
-    OpenRouter --> Parser
-    
-    Parser -->|Integrity Valid| Success[Update Subtitles In-Memory]
-    Parser -->|Integrity Failed| MicroBatch[Auto 1x1 Micro-Batching Fallback]
-    MicroBatch --> Success
-```
+- **Universal Media Subtitle Extraction & Demuxing:** Drop any `.mkv`, `.webm`, `.mp4`, `.mov`, or `.m4v` file. Subtitle Wizard parses EBML / ISO boxes in memory, discovers all embedded text subtitle streams (`SRT`, `ASS`, `SSA`, `VTT`, `tx3g`), and converts them directly to `.srt`.
+- **Dual AI Translation Engine (Local & Cloud BYOK):**
+  - **LM Studio (100% Offline & Private):** Connect to your local LLM server at `http://localhost:1234/v1` for private translation.
+  - **OpenRouter (Bring Your Own Key):** Access models like DeepSeek V3/R1, Claude 3.5 Sonnet, Gemini 2.0 Flash, GPT-4o Mini, and Llama 3.3 directly with your personal API key stored safely in browser `localStorage`.
+- **Batch Translation with 1:1 ID Guarantee:** Batches subtitle cues, preserves multi-speaker dialogues (`- Line 1\n- Line 2`), and automatically degrades to 1x1 micro-batching if JSON response alignment requires it.
+- **Interactive Spotify-Style Lyrics Studio:** A dedicated side-by-side player featuring smooth auto-scroll to the active subtitle, darkened inactive cues, and in-place editing that automatically pauses playback when focused.
+- **Built-in Timing Shift & Diagnostic Tools:** Millisecond-accurate global, progressive, or selective timestamp shifts, plus automated detection of cue overlaps and invalid durations.
+- **Multi-Format Export Suite:** Export seamlessly to SubRip (`.srt`), WebVTT (`.vtt`), Advanced SubStation Alpha (`.ass`), Plain Text (`.txt`), or Bilingual Dual-Language files.
+- **Session Auto-Persistence & Memory Wipe:** Automatically resumes your workspace across page reloads via `localStorage`, with a 1-click *Clear All* button to reset memory.
 
 ---
 
-## 📁 Architecture & Directory Tree
+## 🚀 Getting Started
 
-```
-subtitle-wizard/
-├── public/
-│   ├── favicon.png                   # Official circular favicon
-│   ├── favicon.svg
-│   └── icons.svg
-├── src/
-│   ├── assets/
-│   │   ├── logo/
-│   │   │   ├── sw-logo.png           # Header square brand logo
-│   │   │   ├── sw-circlelogo.png     # Circular icon
-│   │   │   └── sw-textlogo.png       # Text logo asset
-│   │   └── ...
-│   ├── components/
-│   │   ├── ExportModal.jsx               # Multi-format export dialog (.srt, .vtt, .ass, .txt, dual)
-│   │   ├── FileUploader.jsx              # Multi-format dropzone (.srt, .vtt, .ass, .mp4, .mkv, .mov)
-│   │   ├── Header.jsx                    # Header with square logo, provider latency badge & actions
-│   │   ├── LyricsSyncPanel.jsx           # Spotify-style lyrics vertical flow, auto-scroll & auto-pause
-│   │   ├── MediaSyncPlayer.jsx           # Always-on 2-column Media Studio (Video/Canvas + Lyrics)
-│   │   ├── SettingsModal.jsx             # Dual LLM provider configuration (LM Studio & OpenRouter BYOK)
-│   │   ├── StatsBar.jsx                  # Aggregate metrics summary cards (blocks, duration, words)
-│   │   ├── SubtitlePreview.jsx           # Detailed table editor, search filter, export & row actions
-│   │   ├── TimingShiftModal.jsx          # Millisecond offset shifts, scope selection & presets
-│   │   ├── TrackSelectorModal.jsx        # Embedded subtitle track selector & extractor dialog
-│   │   ├── TranslationControlBar.jsx     # Streamlined language selectors, start, pause, resume & cancel
-│   │   └── TranslationProgressBar.jsx    # Live progress bar, batch telemetry, speed & ETA
-│   ├── context/
-│   │   ├── I18nContext.jsx               # Modular i18n Provider and useTranslation() hook
-│   │   └── SettingsContext.jsx           # Dual provider LLM state, OpenRouter key & parameters
-│   ├── hooks/
-│   │   └── useTranslationQueue.js        # Queue orchestrator, lifecycle state machine & telemetry
-│   ├── locales/
-│   │   ├── en/
-│   │   │   ├── common.json               # English actions, alerts, badges, status, footer
-│   │   │   ├── editor.json               # English editor, shift modal, validation & actions
-│   │   │   ├── export.json               # English multi-format export copy & format labels
-│   │   │   ├── extractor.json            # English media extractor and track selector labels
-│   │   │   ├── header.json               # English header, provider badges & navigation labels
-│   │   │   ├── parser.json               # English dropzone, stats, preview labels
-│   │   │   ├── player.json               # English local media player & lyrics sync copy
-│   │   │   ├── settings.json             # English LM Studio & OpenRouter settings & diagnostics
-│   │   │   └── translation.json          # English batch translation controls, progress & statuses
-│   │   └── es/
-│   │       ├── common.json               # Spanish actions, alerts, badges, status, footer
-│   │       ├── editor.json               # Spanish editor, shift modal, validation & actions
-│   │       ├── export.json               # Spanish multi-format export copy & format labels
-│   │       ├── extractor.json            # Spanish media extractor and track selector labels
-│   │       ├── header.json               # Spanish header, provider badges & navigation labels
-│   │       ├── parser.json               # Spanish dropzone, stats, preview labels
-│   │       ├── player.json               # Spanish local media player & lyrics sync copy
-│   │       ├── settings.json             # Spanish LM Studio & OpenRouter settings & diagnostics
-│   │       └── translation.json          # Spanish batch translation controls, progress & statuses
-│   ├── services/
-│   │   ├── llmService.js                 # Dual provider client (LM Studio & OpenRouter)
-│   │   ├── mediaExtractorService.js      # In-browser EBML & MP4 atom subtitle extraction engine
-│   │   ├── storageService.js             # Client project session persistence & clear
-│   │   └── translationService.js         # 1:1 ID validator, dialogue sanitization & batch translator
-│   ├── utils/
-│   │   ├── exporters.js                  # Multi-format converters (SRT, VTT, ASS, TXT, Dual)
-│   │   ├── srtParser.js                  # Core SRT parse, serialize, format & sample generator
-│   │   └── timingUtils.js                # Timing shift, integrity diagnostics, split, merge & insert
-│   ├── App.jsx                           # Root application orchestrating the unified workspace
-│   ├── index.css                         # Tailwind CSS v4 core and glassmorphism styling
-│   └── main.jsx                          # React 19 DOM entry point
-├── eslint.config.js                      # ESLint configuration
-├── index.html                            # HTML5 entry with metadata and favicon
-├── package.json                          # Project manifest and scripts
-├── README.md                             # AI & developer documentation context
-└── vite.config.js                        # Vite + Tailwind v4 plugin configuration
-```
+Follow these steps to run Subtitle Wizard locally on your machine.
 
----
+### Prerequisites
+- [Node.js](https://nodejs.org/) (version `18.0` or newer recommended)
+- [npm](https://www.npmjs.com/) (or `pnpm` / `yarn`)
 
-## 🚀 Status Tracker & Roadmap
-
-| Module | Description | Status | Key Deliverables |
-| :---: | :--- | :---: | :--- |
-| **Phase 1** | **Core Architecture, In-Memory SRT Parser & Modular i18n** | ✅ **Completed** | React 19 + Tailwind CSS v4, i18n ES/EN context, `parseSRT`/`serializeSRT` engine, UI components (`Header`, `FileUploader`, `StatsBar`, `SubtitlePreview`), `README.md`. |
-| **Phase 2** | **Local LLM Server Integration & Diagnostic Module** | ✅ **Completed** | Native fetch `llmService.js` (/models, /chat/completions), `SettingsContext`, `SettingsModal`, live latency tracking, dynamic model discovery, test inference engine. |
-| **Phase 3** | **Batch Translation Engine & Queue Management** | ✅ **Completed** | `translationService.js` with strict JSON prompt schema & resilient parser, `useTranslationQueue.js` hook with pause/resume/cancel/retry, `TranslationControlBar`, `TranslationProgressBar`, dual comparative preview. |
-| **Phase 4** | **Interactive Subtitle Editor & Timing Shift Tools** | ✅ **Completed** | `timingUtils.js` (shift, split, merge, insert, delete, validate), `TimingShiftModal`, in-place editable cues, visual overlap diagnostics, undo history stack. |
-| **Phase 5** | **Multi-Format Export & Synchronized Media Player** | ✅ **Completed** | `exporters.js` (SRT, VTT, ASS, TXT, Dual), `ExportModal`, `MediaSyncPlayer` with live caption overlay and bidirectional click-to-seek, `LyricsSyncPanel` (Spotify Lyrics mode with auto-scroll & auto-pause), `storageService.js` session auto-saving. |
-| **Provider Expansion** | **OpenRouter Native Integration (Cloud BYOK)** | ✅ **Completed** | Dual provider selector in `SettingsModal`, secure `localStorage` API key storage, OpenRouter models library, attribution headers, and dynamic Header status badge. |
-| **Media Extraction** | **Universal In-Memory Subtitle Extraction Engine** | ✅ **Completed** | `mediaExtractorService.js` (MKV/WebM EBML & MP4/MOV atom demuxers), `TrackSelectorModal`, multi-file drag & drop (video + subtitles), standalone VTT/ASS converters. |
-
----
-
-## 💻 Development & Execution
+### Installation & Local Setup
 
 ```bash
-# Install dependencies
+# 1. Clone the repository
+git clone https://github.com/xrev4n/subtitle-wizard.git
+
+# 2. Navigate to the project directory
+cd subtitle-wizard
+
+# 3. Install dependencies
 npm install
 
-# Start Vite development server (with HMR)
+# 4. Start the development server with Hot Module Replacement (HMR)
 npm run dev
+```
 
-# Run ESLint validation
+Open your browser and navigate to `http://localhost:5173`.
+
+### Production Build
+
+```bash
+# Verify code quality and linter rules
 npm run lint
 
-# Build production bundle
+# Build optimized production bundle
 npm run build
 
-# Preview production build
+# Preview production build locally
 npm run preview
 ```
 
 ---
 
-## 📄 License & Attribution
-- **License**: [Creative Commons Zero v1.0 Universal (Public Domain)](https://creativecommons.org/publicdomain/zero/1.0/).
-- **Developed by**: [xrev4n](https://github.com/xrev4n).
+## ⚙️ AI Inference Setup
+
+Subtitle Wizard provides two inference modes accessible from the header status badge:
+
+### 1. LM Studio (Local / Offline)
+1. Download and open [LM Studio](https://lmstudio.ai/).
+2. Load your desired language model (e.g. Qwen 2.5, Llama 3.2, Mistral).
+3. Start the **Local Server** on port `1234`.
+4. Ensure **"Enable CORS"** is toggled ON in LM Studio settings.
+5. Subtitle Wizard will automatically detect and connect to `http://localhost:1234/v1`.
+
+### 2. OpenRouter (Cloud API / BYOK)
+1. Get an API key from [openrouter.ai/keys](https://openrouter.ai/keys).
+2. Click the status badge in the header to open settings.
+3. Select **OpenRouter (Cloud API / BYOK)** and paste your API key.
+4. Pick from popular models (DeepSeek, Claude, Gemini, GPT-4o) or type any OpenRouter model identifier.
+
+---
+
+## 📦 Supported Formats
+
+| Container / File Type | Subtitle Codecs | Supported Operations |
+| :--- | :--- | :---: |
+| **Matroska (`.mkv`, `.webm`)** | `S_TEXT/UTF8`, `S_TEXT/ASS`, `S_TEXT/SSA`, `S_TEXT/WEBVTT` | 📥 Demux & Extract to SRT |
+| **MP4 / QuickTime (`.mp4`, `.mov`, `.m4v`)** | `tx3g` (Timed Text), `wvtt` (WebVTT in MP4), `c608` | 📥 Demux & Extract to SRT |
+| **Standalone Subtitles** | `.srt`, `.vtt`, `.ass`, `.ssa` | 📥 Load & Convert to SRT |
+| **Export Formats** | Single (Source/Translated) or Bilingual Dual Mode | 📤 Export to `.srt`, `.vtt`, `.ass`, `.txt` |
+
+---
+
+## 🤝 Contributing
+
+Contributions, issues, and feature requests are welcome!
+
+1. Fork the Project.
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`).
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`).
+4. Push to the Branch (`git push origin feature/AmazingFeature`).
+5. Open a Pull Request.
+
+---
+
+# 🇪🇸 Español
+
+## 🌟 Acerca de Subtitle Wizard
+
+**Subtitle Wizard** es una plataforma web moderna y centrada en la privacidad diseñada para procesar, extraer, validar, editar, sincronizar, desfasar tiempos, traducir con Inteligencia Artificial y exportar subtítulos en formatos `.srt`, `.vtt` y `.ass` completamente en la memoria del navegador.
+
+Todo se procesa localmente en tu cliente: **cero servidores backend**, **cero intermediarios** y total privacidad para tus archivos multimedia.
+
+---
+
+### ✨ Características Principales
+
+- **Extractor y Demuxeador Universal de Subtítulos:** Arrastra cualquier archivo `.mkv`, `.webm`, `.mp4`, `.mov` o `.m4v`. Subtitle Wizard analiza las cajas EBML / ISO en memoria, identifica todas las pistas de texto (`SRT`, `ASS`, `SSA`, `VTT`, `tx3g`) y las convierte directamente a formato `.srt`.
+- **Motor Dual de Inferencia IA (Local & Nube BYOK):**
+  - **LM Studio (100% Privado y Offline):** Conéctate a tu servidor local en `http://localhost:1234/v1` para traducir sin conexión ni costes.
+  - **OpenRouter (Trae Tu Propia API Key):** Utiliza modelos de primer nivel como DeepSeek V3/R1, Claude 3.5 Sonnet, Gemini 2.0 Flash, GPT-4o Mini o Llama 3.3 con tu propia API key guardada con seguridad en el `localStorage` de tu navegador.
+- **Traducción por Lotes con Garantía de Integridad 1:1:** Procesa bloques en lotes, preserva diálogos entre varios personajes (`- Línea 1\n- Línea 2`) y degrada a micro-lotes 1x1 si la estructura JSON requiere alineación.
+- **Estudio de Sincronización Estilo Spotify Lyrics:** Visualizador interactivo con auto-scroll fluido a la línea activa, atenuación de líneas inactivas y edición directa que pausa automáticamente el video al hacer foco.
+- **Herramientas de Desfase de Tiempo y Diagnóstico:** Ajuste milimétrico global, progresivo o selectivo con protección contra marcas negativas y detección instantánea de solapamientos o duraciones inválidas.
+- **Suite de Exportación Multiformato:** Exporta en SubRip (`.srt`), WebVTT (`.vtt`), Advanced SubStation Alpha (`.ass`), Texto Plano (`.txt`) o modo Bilingüe Dual.
+- **Persistencia de Sesión y Limpieza de Memoria:** Guarda tu progreso automáticamente entre recargas con un botón de *Borrar Todo* para limpiar la memoria al instante.
+
+---
+
+## 🚀 Guía de Inicio Rápido
+
+Sigue estos pasos para ejecutar Subtitle Wizard localmente en tu equipo.
+
+### Requisitos Previos
+- [Node.js](https://nodejs.org/) (versión `18.0` o superior recomendada)
+- [npm](https://www.npmjs.com/) (o `pnpm` / `yarn`)
+
+### Instalación y Ejecución Local
+
+```bash
+# 1. Clonar el repositorio
+git clone https://github.com/xrev4n/subtitle-wizard.git
+
+# 2. Entrar en la carpeta del proyecto
+cd subtitle-wizard
+
+# 3. Instalar las dependencias
+npm install
+
+# 4. Iniciar el servidor de desarrollo Vite (con HMR)
+npm run dev
+```
+
+Abre tu navegador y entra en `http://localhost:5173`.
+
+### Compilación para Producción
+
+```bash
+# Comprobar reglas de código y linter
+npm run lint
+
+# Construir el bundle de producción
+npm run build
+
+# Previsualizar la versión de producción
+npm run preview
+```
+
+---
+
+## ⚙️ Configuración de Proveedores IA
+
+Puedes configurar tu proveedor de inferencia haciendo clic en el badge de estado en la barra superior:
+
+### 1. LM Studio (Servidor Local / Privado)
+1. Abre [LM Studio](https://lmstudio.ai/).
+2. Carga el modelo de tu preferencia (ej. Qwen 2.5, Llama 3.2, Mistral).
+3. Inicia el **Local Server** en el puerto `1234`.
+4. Asegúrate de activar la casilla **"Enable CORS"** en los ajustes del servidor de LM Studio.
+5. Subtitle Wizard detectará y se conectará automáticamente a `http://localhost:1234/v1`.
+
+### 2. OpenRouter (API en la Nube / BYOK)
+1. Obtén tu clave en [openrouter.ai/keys](https://openrouter.ai/keys).
+2. Abre la configuración en la barra superior de Subtitle Wizard.
+3. Selecciona **OpenRouter (Cloud API / BYOK)** y pega tu API key.
+4. Elige un modelo popular (DeepSeek, Claude, Gemini, GPT-4o) o escribe el identificador de cualquier modelo disponible en OpenRouter.
+
+---
+
+## 📁 Formatos Compatibles
+
+| Contenedor / Archivo | Codecs de Subtítulo | Operaciones Disponibles |
+| :--- | :--- | :---: |
+| **Matroska (`.mkv`, `.webm`)** | `S_TEXT/UTF8`, `S_TEXT/ASS`, `S_TEXT/SSA`, `S_TEXT/WEBVTT` | 📥 Demux & Extracción a SRT |
+| **MP4 / QuickTime (`.mp4`, `.mov`, `.m4v`)** | `tx3g` (Timed Text), `wvtt` (WebVTT), `c608` | 📥 Demux & Extracción a SRT |
+| **Subtítulos Sueltos** | `.srt`, `.vtt`, `.ass`, `.ssa` | 📥 Carga & Conversión a SRT |
+| **Formatos de Exportación** | Modo Simple (Origen/Traducido) o Bilingüe Dual | 📤 Exportación a `.srt`, `.vtt`, `.ass`, `.txt` |
+
+---
+
+## 🤝 Cómo Contribuir
+
+¡Las contribuciones, reportes de bugs y sugerencias de mejoras son bienvenidas!
+
+1. Haz un Fork del proyecto.
+2. Crea tu rama de características (`git checkout -b feature/NuevaCaracteristica`).
+3. Haz commit de tus cambios (`git commit -m 'Añade NuevaCaracteristica'`).
+4. Haz push a la rama (`git push origin feature/NuevaCaracteristica`).
+5. Abre un Pull Request.
+
+---
+
+## 📄 License & Attribution / Licencia y Autoría
+
+- **License / Licencia:** [Creative Commons Zero v1.0 Universal (CC0 1.0 - Public Domain / Dominio Público)](https://creativecommons.org/publicdomain/zero/1.0/).
+- **Author & Developer / Desarrollado por:** [xrev4n](https://github.com/xrev4n).
