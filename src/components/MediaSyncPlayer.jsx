@@ -20,13 +20,19 @@ import {
 export default function MediaSyncPlayer({
   subtitles = [],
   seekTimestampMs = null,
+  mediaFile = null,
+  mediaUrl = null,
+  onMediaSelected,
+  onRemoveMedia,
   onActiveCueChange,
   onUpdateCue,
 }) {
   const { t } = useTranslation();
-  const [mediaFile, setMediaFile] = useState(null);
-  const [mediaUrl, setMediaUrl] = useState(null);
-  const [isVideo, setIsVideo] = useState(true);
+  const isVideo = Boolean(
+    mediaFile?.type?.startsWith('video/') ||
+      mediaFile?.name?.match(/\.(mp4|webm|mkv|mov|m4v)$/i)
+  );
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTimeMs, setCurrentTimeMs] = useState(0);
   const [durationMs, setDurationMs] = useState(0);
@@ -46,14 +52,7 @@ export default function MediaSyncPlayer({
 
   const effectiveDurationMs = durationMs > 0 ? durationMs : fallbackDurationMs;
 
-  // Clean up Object URL on unmount or file change
-  useEffect(() => {
-    return () => {
-      if (mediaUrl) {
-        URL.revokeObjectURL(mediaUrl);
-      }
-    };
-  }, [mediaUrl]);
+
 
   // Canvas timer animation when no video is loaded but playback is running
   useEffect(() => {
@@ -98,27 +97,17 @@ export default function MediaSyncPlayer({
   }, [seekTimestampMs]);
 
   // Process selected local video/audio file
-  const handleMediaSelected = (file) => {
-    if (!file) return;
-    if (mediaUrl) {
-      URL.revokeObjectURL(mediaUrl);
+  const handleFileInputChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file && onMediaSelected) {
+      onMediaSelected(file);
     }
-    const url = URL.createObjectURL(file);
-    const isVid = file.type.startsWith('video/') || file.name.match(/\.(mp4|webm|mkv|mov)$/i);
-
-    setMediaFile(file);
-    setMediaUrl(url);
-    setIsVideo(Boolean(isVid));
-    setIsPlaying(false);
-    setCurrentTimeMs(0);
   };
 
-  const handleRemoveMedia = () => {
-    if (mediaUrl) {
-      URL.revokeObjectURL(mediaUrl);
+  const handleInternalRemoveMedia = () => {
+    if (onRemoveMedia) {
+      onRemoveMedia();
     }
-    setMediaFile(null);
-    setMediaUrl(null);
     setIsPlaying(false);
   };
 
@@ -127,75 +116,66 @@ export default function MediaSyncPlayer({
     (s) => s.startMs <= currentTimeMs && currentTimeMs <= s.endMs
   );
 
-  // Notify parent of active cue change for table highlighting
+  // Notify parent of active playing cue
   useEffect(() => {
     if (onActiveCueChange) {
       onActiveCueChange(activeCue ? activeCue.id : null);
     }
   }, [activeCue, onActiveCueChange]);
 
+  // Play / Pause toggle
   const togglePlay = () => {
     if (mediaRef.current) {
-      if (mediaRef.current.paused) {
-        mediaRef.current.play();
-        setIsPlaying(true);
-      } else {
+      if (isPlaying) {
         mediaRef.current.pause();
         setIsPlaying(false);
+      } else {
+        mediaRef.current.play().catch((err) => {
+          console.warn('Playback error:', err);
+        });
+        setIsPlaying(true);
       }
     } else {
       setIsPlaying(!isPlaying);
     }
   };
 
-  const pauseMedia = useCallback(() => {
-    if (mediaRef.current && !mediaRef.current.paused) {
-      mediaRef.current.pause();
-    }
-    setIsPlaying(false);
-  }, []);
-
-  const handleSeekTimestamp = (ms) => {
+  // Skip relative offset in seconds (+5s, -5s)
+  const skipSeconds = (seconds) => {
+    const targetMs = Math.max(0, Math.min(effectiveDurationMs, currentTimeMs + seconds * 1000));
     if (mediaRef.current) {
-      mediaRef.current.currentTime = ms / 1000;
-      setCurrentTimeMs(ms);
-      if (mediaRef.current.paused) {
-        mediaRef.current.play().catch(() => {});
-        setIsPlaying(true);
-      }
-    } else {
-      setCurrentTimeMs(ms);
-      setIsPlaying(true);
+      mediaRef.current.currentTime = targetMs / 1000;
     }
+    setCurrentTimeMs(targetMs);
   };
 
+  // Handle media timeupdate
   const handleTimeUpdate = () => {
-    if (!mediaRef.current) return;
-    setCurrentTimeMs(Math.round(mediaRef.current.currentTime * 1000));
+    if (mediaRef.current) {
+      setCurrentTimeMs(Math.round(mediaRef.current.currentTime * 1000));
+    }
   };
 
+  // Handle metadata loaded (video duration)
   const handleLoadedMetadata = () => {
-    if (!mediaRef.current) return;
-    setDurationMs(Math.round(mediaRef.current.duration * 1000));
-  };
-
-  const handleSeek = (e) => {
-    const seekMs = parseInt(e.target.value, 10);
     if (mediaRef.current) {
-      mediaRef.current.currentTime = seekMs / 1000;
+      setDurationMs(Math.round(mediaRef.current.duration * 1000));
+      mediaRef.current.volume = volume;
+      mediaRef.current.playbackRate = playbackRate;
     }
-    setCurrentTimeMs(seekMs);
   };
 
-  const handleSkip = (seconds) => {
-    const nextMs = Math.max(0, Math.min(effectiveDurationMs, currentTimeMs + seconds * 1000));
+  // Handle seek bar interaction
+  const handleSeekChange = (e) => {
+    const targetMs = parseInt(e.target.value, 10);
+    setCurrentTimeMs(targetMs);
     if (mediaRef.current) {
-      mediaRef.current.currentTime = nextMs / 1000;
+      mediaRef.current.currentTime = targetMs / 1000;
     }
-    setCurrentTimeMs(nextMs);
   };
 
-  const handleRateChange = (rate) => {
+  // Speed and volume handlers
+  const handleSpeedChange = (rate) => {
     setPlaybackRate(rate);
     if (mediaRef.current) {
       mediaRef.current.playbackRate = rate;
@@ -225,8 +205,8 @@ export default function MediaSyncPlayer({
       <input
         type="file"
         ref={fileInputRef}
-        onChange={(e) => e.target.files?.[0] && handleMediaSelected(e.target.files[0])}
-        accept="video/*,audio/*,.mkv,.mp4,.webm,.mp3,.wav,.m4a"
+        onChange={handleFileInputChange}
+        accept="video/*,audio/*,.mkv,.mp4,.webm,.mov,.m4v,.mp3,.wav,.m4a"
         className="hidden"
       />
 
@@ -243,7 +223,7 @@ export default function MediaSyncPlayer({
           <div>
             <div className="flex items-center gap-2">
               <h3 className="text-xs sm:text-sm font-bold text-white m-0 p-0">
-                {mediaUrl ? (isVideo ? 'Reproductor de Video' : 'Reproductor de Audio') : t('player.canvasPreview')}
+                {mediaUrl ? (isVideo ? t('player.videoPlayer') : t('player.audioPlayer')) : t('player.canvasPreview')}
               </h3>
               {mediaFile && (
                 <span className="text-[11px] font-mono text-slate-400 max-w-[150px] truncate">
@@ -296,54 +276,48 @@ export default function MediaSyncPlayer({
               onClick={() => setCaptionMode('off')}
               className={`px-2 py-0.5 rounded text-[10px] font-medium transition-colors cursor-pointer ${
                 captionMode === 'off'
-                  ? 'bg-slate-700 text-white'
-                  : 'text-slate-500 hover:text-white'
+                  ? 'bg-indigo-600 text-white'
+                  : 'text-slate-400 hover:text-white'
               }`}
             >
               Off
             </button>
           </div>
 
-          {/* Load / Change Video Action */}
-          {mediaUrl ? (
-            <div className="flex items-center gap-1">
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="px-2.5 py-1 text-[11px] font-medium rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors cursor-pointer"
-                title={t('player.changeMedia')}
-              >
-                {t('player.changeMedia')}
-              </button>
-              <button
-                type="button"
-                onClick={handleRemoveMedia}
-                className="p-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-rose-300 cursor-pointer transition-colors"
-                title={t('player.controls.removeMedia')}
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          ) : (
+          {/* Upload / Replace Media Button */}
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="px-2.5 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-white/10 text-slate-300 hover:text-white text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer"
+            title="Cargar archivo de video o audio local"
+          >
+            <Upload className="w-3.5 h-3.5 text-indigo-400" />
+            <span className="hidden sm:inline">
+              {mediaUrl ? t('player.replaceMedia') : t('player.loadMedia')}
+            </span>
+          </button>
+
+          {/* Remove Media Button */}
+          {mediaUrl && (
             <button
               type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="px-2.5 py-1 text-[11px] font-medium rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 transition-all flex items-center gap-1.5 cursor-pointer"
+              onClick={handleInternalRemoveMedia}
+              className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-white/10 text-slate-400 hover:text-rose-400 transition-colors cursor-pointer"
+              title="Quitar medio y volver a lienzo"
             >
-              <Upload className="w-3 h-3" />
-              <span>{t('player.loadMedia')}</span>
+              <X className="w-3.5 h-3.5" />
             </button>
           )}
         </div>
       </div>
 
-      {/* Main Studio Body: 2-Column Responsive Workspace */}
-      <div className="p-4">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+      {/* Main 2-Column Studio: Left = Video/Canvas Stage | Right = Spotify Lyrics Flow Panel */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 lg:divide-x divide-white/10 bg-slate-950/60">
+        
+        {/* LEFT COLUMN: Stage & Player Controls (Span 7 on lg) */}
+        <div className="lg:col-span-7 p-4 sm:p-5 flex flex-col justify-between space-y-4">
           
-          {/* Left Column: Stage View & Transport Controls (lg:col-span-7) */}
-          <div className="lg:col-span-7 space-y-3">
-            
+          <div className="space-y-3">
             {/* Pure Black Stage Surface (Video or Dark Canvas Preview) */}
             <div className="relative rounded-2xl overflow-hidden bg-black aspect-video max-h-[360px] flex items-center justify-center border border-white/10 shadow-inner group">
               {mediaUrl ? (
@@ -395,20 +369,21 @@ export default function MediaSyncPlayer({
 
               {/* Live Synchronized Subtitle Overlay */}
               {captionMode !== 'off' && activeCue && (
-                <div className="absolute bottom-4 inset-x-6 flex justify-center pointer-events-none transition-all">
-                  <div className="max-w-xl px-4 py-2 rounded-xl bg-black/85 backdrop-blur-md border border-white/15 text-center shadow-2xl space-y-1 animate-fadeIn">
-                    {(captionMode === 'dual' || captionMode === 'source') && activeCue.sourceText && (
-                      <p className="text-xs sm:text-sm font-medium text-slate-200 leading-snug drop-shadow-md m-0">
+                <div className="absolute inset-x-4 bottom-4 flex flex-col items-center pointer-events-none z-10">
+                  <div className="bg-black/85 backdrop-blur-md border border-white/20 px-4 py-2.5 rounded-xl shadow-2xl text-center max-w-[90%] transition-all animate-fadeIn">
+                    {(captionMode === 'dual' || captionMode === 'translated') && (
+                      <p className="text-sm sm:text-base font-bold text-white leading-snug drop-shadow-md">
+                        {activeCue.targetText || activeCue.sourceText}
+                      </p>
+                    )}
+                    {captionMode === 'dual' && activeCue.targetText && (
+                      <p className="text-xs sm:text-sm text-indigo-300/90 font-medium mt-1 leading-snug drop-shadow">
                         {activeCue.sourceText}
                       </p>
                     )}
-                    {(captionMode === 'dual' || captionMode === 'translated') && (
-                      <p className="text-xs sm:text-sm font-bold text-amber-300 leading-snug drop-shadow-md m-0">
-                        {activeCue.targetText || (
-                          <span className="italic text-slate-400 font-normal">
-                            ({activeCue.sourceText})
-                          </span>
-                        )}
+                    {captionMode === 'source' && (
+                      <p className="text-sm sm:text-base font-bold text-white leading-snug drop-shadow-md">
+                        {activeCue.sourceText}
                       </p>
                     )}
                   </div>
@@ -416,119 +391,124 @@ export default function MediaSyncPlayer({
               )}
             </div>
 
-            {/* Stage Timeline Scrubber */}
-            <div className="space-y-1 px-1">
+            {/* Custom Playback Timeline Slider */}
+            <div className="space-y-1">
               <input
                 type="range"
                 min="0"
-                max={effectiveDurationMs || 100}
+                max={effectiveDurationMs || 1000}
                 value={currentTimeMs}
-                onChange={handleSeek}
+                onChange={handleSeekChange}
                 className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500"
               />
-
-              <div className="flex items-center justify-between text-[11px] font-mono text-slate-400">
+              <div className="flex justify-between text-[11px] font-mono text-slate-400 px-0.5">
                 <span>{formatDuration(currentTimeMs)}</span>
                 <span>{formatDuration(effectiveDurationMs)}</span>
               </div>
             </div>
-
-            {/* Transport Controls Bar */}
-            <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
-              
-              {/* Playback action buttons */}
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => handleSkip(-5)}
-                  className="p-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 border border-white/10 transition-colors cursor-pointer"
-                  title="-5s"
-                >
-                  <RotateCcw className="w-3.5 h-3.5" />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={togglePlay}
-                  className="p-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/30 transition-all cursor-pointer"
-                >
-                  {isPlaying ? <Pause className="w-4 h-4 fill-current" /> : <Play className="w-4 h-4 fill-current ml-0.5" />}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleSkip(5)}
-                  className="p-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 border border-white/10 transition-colors cursor-pointer"
-                  title="+5s"
-                >
-                  <RotateCw className="w-3.5 h-3.5" />
-                </button>
-
-                {/* Volume Control (only when media loaded) */}
-                {mediaUrl && (
-                  <div className="flex items-center gap-1.5 pl-2">
-                    <button
-                      type="button"
-                      onClick={toggleMute}
-                      className="text-slate-400 hover:text-white cursor-pointer"
-                    >
-                      {isMuted || volume === 0 ? (
-                        <VolumeX className="w-4 h-4 text-rose-400" />
-                      ) : (
-                        <Volume2 className="w-4 h-4" />
-                      )}
-                    </button>
-                    <input
-                      type="range"
-                      min="0"
-                      max="1"
-                      step="0.05"
-                      value={isMuted ? 0 : volume}
-                      onChange={handleVolumeChange}
-                      className="w-16 h-1 bg-slate-800 rounded accent-indigo-500 cursor-pointer hidden sm:block"
-                    />
-                  </div>
-                )}
-              </div>
-
-              {/* Playback Speed selector */}
-              <div className="flex items-center gap-1 text-xs">
-                <span className="text-[11px] text-slate-500 font-medium hidden sm:inline">
-                  {t('player.controls.speed')}:
-                </span>
-                {[0.75, 1.0, 1.25, 1.5].map((rate) => (
-                  <button
-                    key={rate}
-                    type="button"
-                    onClick={() => handleRateChange(rate)}
-                    className={`px-2 py-0.5 text-[10px] font-mono rounded-lg border transition-all cursor-pointer ${
-                      playbackRate === rate
-                        ? 'bg-indigo-600 text-white border-indigo-500'
-                        : 'bg-slate-900/60 text-slate-400 border-white/10 hover:bg-slate-800'
-                    }`}
-                  >
-                    {rate}x
-                  </button>
-                ))}
-              </div>
-
-            </div>
-
           </div>
 
-          {/* Right Column: Spotify Lyrics Interactive Panel (lg:col-span-5) */}
-          <div className="lg:col-span-5 w-full">
-            <LyricsSyncPanel
-              subtitles={subtitles}
-              activeCueId={activeCue?.id}
-              onSeek={handleSeekTimestamp}
-              onUpdateCue={onUpdateCue}
-              onPauseMedia={pauseMedia}
-              isPlaying={isPlaying}
-            />
+          {/* Unified Audio / Video Player Control Toolbar */}
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-white/5">
+            {/* Play, Pause, Rewind & Forward */}
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => skipSeconds(-5)}
+                className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white transition-colors cursor-pointer"
+                title="Retroceder 5 segundos"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+              </button>
+
+              <button
+                type="button"
+                onClick={togglePlay}
+                className="w-9 h-9 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/30 flex items-center justify-center transition-transform hover:scale-105 cursor-pointer"
+                title={isPlaying ? 'Pausar' : 'Reproducir'}
+              >
+                {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => skipSeconds(5)}
+                className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white transition-colors cursor-pointer"
+                title="Avanzar 5 segundos"
+              >
+                <RotateCw className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            {/* Speed Selector */}
+            <div className="flex items-center gap-1 bg-slate-900/80 p-0.5 rounded-lg border border-white/10 text-xs">
+              {[0.75, 1, 1.25, 1.5, 2].map((rate) => (
+                <button
+                  key={rate}
+                  type="button"
+                  onClick={() => handleSpeedChange(rate)}
+                  className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-medium transition-colors cursor-pointer ${
+                    playbackRate === rate
+                      ? 'bg-indigo-600 text-white'
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  {rate}x
+                </button>
+              ))}
+            </div>
+
+            {/* Volume & Mute */}
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={toggleMute}
+                className="p-1.5 text-slate-400 hover:text-white transition-colors cursor-pointer"
+              >
+                {isMuted || volume === 0 ? (
+                  <VolumeX className="w-4 h-4 text-rose-400" />
+                ) : (
+                  <Volume2 className="w-4 h-4" />
+                )}
+              </button>
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.05"
+                value={isMuted ? 0 : volume}
+                onChange={handleVolumeChange}
+                className="w-16 h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500"
+              />
+            </div>
           </div>
 
         </div>
+
+        {/* RIGHT COLUMN: Interactive Spotify Lyrics Flow & Live In-Place Editor (Span 5 on lg) */}
+        <div className="lg:col-span-5 p-4 sm:p-5 flex flex-col h-full min-h-[380px] max-h-[460px]">
+          <LyricsSyncPanel
+            subtitles={subtitles}
+            currentTimeMs={currentTimeMs}
+            activeCueId={activeCue?.id}
+            onSeek={useCallback((targetMs) => {
+              if (mediaRef.current) {
+                mediaRef.current.currentTime = targetMs / 1000;
+              }
+              setCurrentTimeMs(targetMs);
+            }, [])}
+            onPausePlayback={useCallback(() => {
+              if (mediaRef.current && !mediaRef.current.paused) {
+                mediaRef.current.pause();
+                setIsPlaying(false);
+              } else if (!mediaRef.current && isPlaying) {
+                setIsPlaying(false);
+              }
+            }, [isPlaying])}
+            onUpdateCue={onUpdateCue}
+          />
+        </div>
+
       </div>
 
     </div>

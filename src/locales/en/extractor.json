@@ -1,0 +1,24 @@
+{
+  "title": "Embedded Subtitle Tracks",
+  "subtitle": "Subtitle tracks were detected inside your media file. Choose which track to extract and load into the editor.",
+  "inspecting": "Inspecting tracks inside video...",
+  "extracting": "Extracting and demuxing track...",
+  "trackList": "Available Tracks ({count})",
+  "noTracksFound": "No embedded subtitle tracks were detected in this file.",
+  "trackItem": {
+    "track": "Track",
+    "format": "Format",
+    "language": "Language",
+    "bitmapWarning": "Bitmap subtitle format (PGS/VobSub). Cannot be converted directly to text. An external SRT file is recommended."
+  },
+  "actions": {
+    "extractAndLoad": "Extract and Load this Track",
+    "skipAndUseVideo": "Skip and Use Video Only",
+    "cancel": "Cancel"
+  },
+  "alerts": {
+    "extractSuccess": "Track #{id} ({format}) successfully extracted and converted to SRT.",
+    "extractFailed": "Error extracting subtitle track: {error}",
+    "noTextTracks": "This video only contains image-based subtitle tracks (PGS/VobSub) or contains no text tracks."
+  }
+}

@@ -630,10 +630,7 @@ export default function SettingsModal() {
         </div>
 
         {/* Modal Footer */}
-        <div className="px-6 py-4 border-t border-white/10 bg-slate-950 flex items-center justify-between">
-          <div className="text-xs text-slate-500">
-            {t('common.badges.privacy')}
-          </div>
+        <div className="px-6 py-4 border-t border-white/10 bg-slate-950 flex items-center justify-end">
           <div className="flex items-center gap-3">
             <button
               type="button"

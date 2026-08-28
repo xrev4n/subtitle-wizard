@@ -1,6 +1,6 @@
 # Subtitle Wizard 🪄
 
-> **100% In-Memory, Client-Side Subtitle Processing, Interactive Editor, Spotify Lyrics Studio & AI Translation Platform**
+> **100% In-Memory, Client-Side Subtitle Processing, Interactive Editor, Spotify Lyrics Studio, AI Translation & Universal Media Subtitle Extractor**
 > 
 > *Optimized for AI Agents, Pair-Programming Assistants & Human Developers.*
 
@@ -8,10 +8,11 @@
 
 ## 🌟 Project Overview
 
-**Subtitle Wizard** is a modern, privacy-first web application designed to parse, validate, edit, timing-shift, synchronize, translate, and export `.srt`, `.vtt`, and `.ass` subtitle files entirely in client memory. All processing occurs locally within the browser, requiring **zero backend servers**, **zero intermediate proxies**, and guaranteeing complete user privacy.
+**Subtitle Wizard** is a modern, privacy-first web application designed to parse, extract, validate, edit, timing-shift, synchronize, translate, and export `.srt`, `.vtt`, and `.ass` subtitle files entirely in client memory. All processing occurs locally within the browser, requiring **zero backend servers**, **zero intermediate proxies**, and guaranteeing complete user privacy.
 
 ### Key Mission & Objectives
-- **Zero-Cloud & 100% In-Browser Execution**: All subtitle parsing, editing, waveform sync, and state management run in client memory without external server persistence.
+- **Zero-Cloud & 100% In-Browser Execution**: All subtitle parsing, editing, waveform sync, container inspection, and state management run in client memory without external server persistence.
+- **Universal Media Subtitle Extractor & Demuxer**: Inspects video/audio containers (`.mkv`, `.webm`, `.mp4`, `.mov`, `.m4v`) in browser memory via binary EBML / ISO Box parsing, identifies all embedded subtitle tracks, and converts selected tracks directly into editable `.srt` format.
 - **Dual LLM Provider Architecture (LM Studio & OpenRouter)**:
   - **LM Studio (Local / Private)**: 100% offline inference on your own hardware via local endpoints (`http://localhost:1234/v1`).
   - **OpenRouter (Cloud API / BYOK)**: Access DeepSeek V3/R1, Claude 3.5 Sonnet, Gemini 2.0 Flash, Llama 3.3 70B, GPT-4o Mini and more using your own OpenRouter API key stored safely in browser `localStorage`.
@@ -36,6 +37,7 @@
 | **Styling Engine** | Tailwind CSS v4 (`^4.3.3`) + `@tailwindcss/vite` | Modern `@import "tailwindcss";` without legacy configs |
 | **Iconography** | Lucide React (`^1.35.0`) | Clean, accessible SVG icons |
 | **Class Utilities** | `clsx` + `tailwind-merge` | Conditional and merged utility styling |
+| **Universal Media Extractor** | Pure ES Modules (`src/services/mediaExtractorService.js`) | In-browser EBML & MP4 atom demuxer for embedded subtitles |
 | **Parser & Serializer** | Pure ES Modules (`src/utils/srtParser.js`) | Zero-dependency millisecond-accurate SRT parser |
 | **Timing & Integrity Engine** | Pure ES Modules (`src/utils/timingUtils.js`) | Time shifting, overlap validator, split, merge & insert |
 | **Multi-Format Exporters** | Pure ES Modules (`src/utils/exporters.js`) | SRT, WebVTT, ASS/SSA, Plain text & Bilingual dual |
@@ -44,6 +46,42 @@
 | **Local Media Player** | HTML5 Media API (`src/components/MediaSyncPlayer.jsx`) | Memory-safe `URL.createObjectURL` video/audio live sync & pitch-black canvas stage |
 | **Spotify Lyrics Panel** | Custom Sync Engine (`src/components/LyricsSyncPanel.jsx`) | Smooth auto-scroll, auto-pause on focus, and channel viewing |
 | **Session Persistence** | Web Storage (`src/services/storageService.js`) | Automatic client-side project snapshot caching & wipe |
+
+---
+
+## 📦 Universal In-Memory Subtitle Extraction Matrix
+
+```mermaid
+graph TD
+    UserDrop[User Drops File(s)] --> DropType{File Type Detection}
+    
+    DropType -->|Subtitle File (.srt, .vtt, .ass)| SubConverter[convertSubtitleToSRT]
+    DropType -->|Video Container (.mkv, .webm, .mp4, .mov)| MediaInspector[detectSubtitleTracks]
+    DropType -->|Multi-Drop: Video + Subtitle| MultiLoad[Load Video to Player & Subtitles to Editor]
+    
+    MediaInspector --> HasTracks{Tracks Found?}
+    HasTracks -->|Yes| Modal[TrackSelectorModal\nLanguage, Format, Title, Bitmap Filter]
+    HasTracks -->|No| InitStage[Load Video into Media Studio]
+    
+    Modal --> UserSelect[User Selects Track]
+    UserSelect --> Extractor[extractTrackAsSRT\nEBML / ISO Box Demuxer]
+    Extractor --> SubConverter
+    SubConverter --> Workspace[Mount in Unified Workspace & Editor]
+```
+
+### Supported Media Containers & Subtitle Codecs
+
+| Container Format | Subtitle Codec ID | Extraction Support | Output Format |
+| :--- | :--- | :---: | :--- |
+| **Matroska (`.mkv`)** | `S_TEXT/UTF8` (SRT) | ✅ **Full Text** | Canonical `.srt` |
+| **Matroska (`.mkv`)** | `S_TEXT/ASS` / `S_TEXT/SSA` | ✅ **Full Text** | Sanitized `.srt` |
+| **Matroska (`.mkv`)** | `S_TEXT/WEBVTT` | ✅ **Full Text** | Canonical `.srt` |
+| **Matroska (`.mkv`)** | `S_HDMV/PGS` (Bluray Bitmap) | ⚠️ Flagged (Image) | Detected & Informative Badge |
+| **Matroska (`.mkv`)** | `S_VOBSUB` (DVD Bitmap) | ⚠️ Flagged (Image) | Detected & Informative Badge |
+| **WebM (`.webm`)** | `D_WEBVTT/SUBTITLES` | ✅ **Full Text** | Canonical `.srt` |
+| **MP4 / MOV (`.mp4`, `.mov`, `.m4v`)** | `tx3g` / `text` (QuickTime Timed Text) | ✅ **Full Text** | Canonical `.srt` |
+| **MP4 / MOV (`.mp4`, `.mov`, `.m4v`)** | `wvtt` (WebVTT in MP4) | ✅ **Full Text** | Canonical `.srt` |
+| **Standalone Subtitles** | `.srt`, `.vtt`, `.ass`, `.ssa` | ✅ **Full Text** | Canonical `.srt` |
 
 ---
 
@@ -67,17 +105,6 @@ graph TD
     MicroBatch --> Success
 ```
 
-### Provider Configuration Matrix
-
-| Feature | LM Studio (Local) | OpenRouter (Cloud BYOK) |
-| :--- | :--- | :--- |
-| **Hosting** | Local workstation | Cloud multi-provider gateway (`openrouter.ai`) |
-| **Privacy / Network** | 100% Offline / Localhost | Direct client-to-OpenRouter HTTPS call |
-| **Auth Requirement** | None (Local server) | User API Key (`sk-or-v1-...`) stored in `localStorage` |
-| **Supported Models** | Any locally downloaded GGUF/MLX | DeepSeek V3/R1, Claude 3.5, Gemini 2.0, Llama 3.3, GPT-4o |
-| **Request Headers** | Standard JSON | `Authorization: Bearer <KEY>`, `HTTP-Referer`, `X-Title` |
-| **1:1 Validation & Fallback** | ✅ Full support | ✅ Full support |
-
 ---
 
 ## 📁 Architecture & Directory Tree
@@ -85,21 +112,27 @@ graph TD
 ```
 subtitle-wizard/
 ├── public/
+│   ├── favicon.png                   # Official circular favicon
 │   ├── favicon.svg
 │   └── icons.svg
 ├── src/
 │   ├── assets/
+│   │   ├── logo/
+│   │   │   ├── sw-logo.png           # Header square brand logo
+│   │   │   ├── sw-circlelogo.png     # Circular icon
+│   │   │   └── sw-textlogo.png       # Text logo asset
 │   │   └── ...
 │   ├── components/
 │   │   ├── ExportModal.jsx               # Multi-format export dialog (.srt, .vtt, .ass, .txt, dual)
-│   │   ├── FileUploader.jsx              # Minimalist landing dropzone with sample loader
-│   │   ├── Header.jsx                    # Header with LM Studio / OpenRouter latency badge & quick actions
+│   │   ├── FileUploader.jsx              # Multi-format dropzone (.srt, .vtt, .ass, .mp4, .mkv, .mov)
+│   │   ├── Header.jsx                    # Header with square logo, provider latency badge & actions
 │   │   ├── LyricsSyncPanel.jsx           # Spotify-style lyrics vertical flow, auto-scroll & auto-pause
 │   │   ├── MediaSyncPlayer.jsx           # Always-on 2-column Media Studio (Video/Canvas + Lyrics)
 │   │   ├── SettingsModal.jsx             # Dual LLM provider configuration (LM Studio & OpenRouter BYOK)
 │   │   ├── StatsBar.jsx                  # Aggregate metrics summary cards (blocks, duration, words)
 │   │   ├── SubtitlePreview.jsx           # Detailed table editor, search filter, export & row actions
 │   │   ├── TimingShiftModal.jsx          # Millisecond offset shifts, scope selection & presets
+│   │   ├── TrackSelectorModal.jsx        # Embedded subtitle track selector & extractor dialog
 │   │   ├── TranslationControlBar.jsx     # Streamlined language selectors, start, pause, resume & cancel
 │   │   └── TranslationProgressBar.jsx    # Live progress bar, batch telemetry, speed & ETA
 │   ├── context/
@@ -112,6 +145,7 @@ subtitle-wizard/
 │   │   │   ├── common.json               # English actions, alerts, badges, status, footer
 │   │   │   ├── editor.json               # English editor, shift modal, validation & actions
 │   │   │   ├── export.json               # English multi-format export copy & format labels
+│   │   │   ├── extractor.json            # English media extractor and track selector labels
 │   │   │   ├── header.json               # English header, provider badges & navigation labels
 │   │   │   ├── parser.json               # English dropzone, stats, preview labels
 │   │   │   ├── player.json               # English local media player & lyrics sync copy
@@ -121,6 +155,7 @@ subtitle-wizard/
 │   │       ├── common.json               # Spanish actions, alerts, badges, status, footer
 │   │       ├── editor.json               # Spanish editor, shift modal, validation & actions
 │   │       ├── export.json               # Spanish multi-format export copy & format labels
+│   │       ├── extractor.json            # Spanish media extractor and track selector labels
 │   │       ├── header.json               # Spanish header, provider badges & navigation labels
 │   │       ├── parser.json               # Spanish dropzone, stats, preview labels
 │   │       ├── player.json               # Spanish local media player & lyrics sync copy
@@ -128,6 +163,7 @@ subtitle-wizard/
 │   │       └── translation.json          # Spanish batch translation controls, progress & statuses
 │   ├── services/
 │   │   ├── llmService.js                 # Dual provider client (LM Studio & OpenRouter)
+│   │   ├── mediaExtractorService.js      # In-browser EBML & MP4 atom subtitle extraction engine
 │   │   ├── storageService.js             # Client project session persistence & clear
 │   │   └── translationService.js         # 1:1 ID validator, dialogue sanitization & batch translator
 │   ├── utils/
@@ -138,7 +174,7 @@ subtitle-wizard/
 │   ├── index.css                         # Tailwind CSS v4 core and glassmorphism styling
 │   └── main.jsx                          # React 19 DOM entry point
 ├── eslint.config.js                      # ESLint configuration
-├── index.html                            # HTML5 entry with metadata
+├── index.html                            # HTML5 entry with metadata and favicon
 ├── package.json                          # Project manifest and scripts
 ├── README.md                             # AI & developer documentation context
 └── vite.config.js                        # Vite + Tailwind v4 plugin configuration
@@ -155,8 +191,8 @@ subtitle-wizard/
 | **Phase 3** | **Batch Translation Engine & Queue Management** | ✅ **Completed** | `translationService.js` with strict JSON prompt schema & resilient parser, `useTranslationQueue.js` hook with pause/resume/cancel/retry, `TranslationControlBar`, `TranslationProgressBar`, dual comparative preview. |
 | **Phase 4** | **Interactive Subtitle Editor & Timing Shift Tools** | ✅ **Completed** | `timingUtils.js` (shift, split, merge, insert, delete, validate), `TimingShiftModal`, in-place editable cues, visual overlap diagnostics, undo history stack. |
 | **Phase 5** | **Multi-Format Export & Synchronized Media Player** | ✅ **Completed** | `exporters.js` (SRT, VTT, ASS, TXT, Dual), `ExportModal`, `MediaSyncPlayer` with live caption overlay and bidirectional click-to-seek, `LyricsSyncPanel` (Spotify Lyrics mode with auto-scroll & auto-pause), `storageService.js` session auto-saving. |
-| **UX Polish** | **Unified Minimalist Workspace & 1:1 Shield** | ✅ **Completed** | Always-on 2-column Media Studio, pitch-black video container, 1:1 ID validator, multi-speaker dialogue prompt, auto 1x1 micro-batch fallback. |
 | **Provider Expansion** | **OpenRouter Native Integration (Cloud BYOK)** | ✅ **Completed** | Dual provider selector in `SettingsModal`, secure `localStorage` API key storage, OpenRouter models library, attribution headers, and dynamic Header status badge. |
+| **Media Extraction** | **Universal In-Memory Subtitle Extraction Engine** | ✅ **Completed** | `mediaExtractorService.js` (MKV/WebM EBML & MP4/MOV atom demuxers), `TrackSelectorModal`, multi-file drag & drop (video + subtitles), standalone VTT/ASS converters. |
 
 ---
 

@@ -1,0 +1,24 @@
+{
+  "title": "Pistas de Subtítulos Incrustadas",
+  "subtitle": "Se han detectado pistas de subtítulos en tu archivo multimedia. Selecciona cuál deseas extraer y cargar en el editor.",
+  "inspecting": "Inspeccionando pistas en el video...",
+  "extracting": "Extrayendo y demuxeando pista...",
+  "trackList": "Pistas Disponibles ({count})",
+  "noTracksFound": "No se detectaron pistas de subtítulos incrustadas en este archivo.",
+  "trackItem": {
+    "track": "Pista",
+    "format": "Formato",
+    "language": "Idioma",
+    "bitmapWarning": "Subtítulo en mapa de bits (PGS/VobSub). No convertible directamente a texto. Se recomienda un archivo SRT externo."
+  },
+  "actions": {
+    "extractAndLoad": "Extraer y Cargar esta Pista",
+    "skipAndUseVideo": "Omitir y Usar Solo Video",
+    "cancel": "Cancelar"
+  },
+  "alerts": {
+    "extractSuccess": "Pista #{id} ({format}) extraída y convertida a SRT con éxito.",
+    "extractFailed": "Error al extraer la pista de subtítulo: {error}",
+    "noTextTracks": "Este video solo contiene pistas de subtítulos basadas en imagen (PGS/VobSub) o no contiene pistas de texto."
+  }
+}

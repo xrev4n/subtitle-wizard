@@ -4,9 +4,7 @@ import swLogo from '../assets/logo/sw-logo.png';
 import {
   Server,
   Globe,
-  Settings,
   CheckCircle2,
-  AlertTriangle,
   PlusCircle,
   Trash2,
   Cloud,
@@ -56,6 +54,7 @@ export default function Header({ onNewProject, onClearAll, hasActiveProject = fa
             type="button"
             onClick={() => setIsSettingsOpen(true)}
             className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 text-indigo-300 text-xs font-medium transition-all cursor-pointer"
+            title="Conectando..."
           >
             <div className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
@@ -71,42 +70,27 @@ export default function Header({ onNewProject, onClearAll, hasActiveProject = fa
         );
 
       case 'error':
-        return (
-          <button
-            type="button"
-            onClick={() => setIsSettingsOpen(true)}
-            className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-300 text-xs font-medium transition-all cursor-pointer"
-            title={`${providerLabel} desconectado o error. Clic para configurar`}
-          >
-            <div className="relative flex h-2 w-2">
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
-            </div>
-            <AlertTriangle className="w-3.5 h-3.5 text-rose-400 hidden sm:inline" />
-            <span className="font-semibold text-rose-300 text-[11px]">
-              {isOR && !settings.openRouterKey ? t('header.serverStatus.noKey') : 'Offline / Error'}
-            </span>
-          </button>
-        );
-
       case 'disconnected':
       default:
         return (
           <button
             type="button"
             onClick={() => setIsSettingsOpen(true)}
-            className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 text-amber-300 text-xs font-medium transition-all cursor-pointer"
-            title={`Clic para configurar ${providerLabel}`}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-medium transition-all group cursor-pointer"
+            title={t('header.serverStatus.configurePrompt')}
           >
             <div className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
             </div>
             {isOR ? (
-              <Cloud className="w-3.5 h-3.5 text-amber-400 hidden sm:inline" />
+              <Cloud className="w-3.5 h-3.5 text-amber-400" />
             ) : (
-              <Server className="w-3.5 h-3.5 text-amber-400 hidden sm:inline" />
+              <Server className="w-3.5 h-3.5 text-amber-400" />
             )}
-            <span className="font-semibold text-amber-300 text-[11px]">{t('header.serverStatus.pending')}</span>
+            <span className="font-semibold text-amber-300 text-[11px]">
+              {t('header.serverStatus.configurePrompt')}
+            </span>
           </button>
         );
     }
@@ -124,14 +108,9 @@ export default function Header({ onNewProject, onClearAll, hasActiveProject = fa
               alt="Subtitle Wizard Logo"
               className="w-8 h-8 sm:w-9 sm:h-9 object-contain select-none"
             />
-            <div className="flex items-center gap-2">
-              <h1 className="text-base sm:text-lg font-bold tracking-tight text-white m-0 p-0 leading-tight">
-                Subtitle Wizard
-              </h1>
-              <span className="hidden sm:inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-semibold bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">
-                Workspace
-              </span>
-            </div>
+            <h1 className="text-base sm:text-lg font-bold tracking-tight text-white m-0 p-0 leading-tight">
+              Subtitle Wizard
+            </h1>
           </div>
 
           {/* Right Action & Status Badges */}
@@ -168,16 +147,6 @@ export default function Header({ onNewProject, onClearAll, hasActiveProject = fa
                 )}
               </div>
             )}
-
-            {/* Settings Gear Button */}
-            <button
-              type="button"
-              onClick={() => setIsSettingsOpen(true)}
-              className="p-1.5 sm:p-2 rounded-lg bg-slate-900/80 hover:bg-slate-800 border border-white/10 text-slate-300 hover:text-white transition-colors cursor-pointer"
-              title="Ajustes de LLM / OpenRouter"
-            >
-              <Settings className="w-4 h-4" />
-            </button>
 
             {/* Language Switcher */}
             <div className="flex items-center p-0.5 rounded-lg bg-slate-900/80 border border-white/10 shadow-inner">

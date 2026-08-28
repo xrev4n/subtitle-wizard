@@ -1,36 +1,36 @@
 {
   "dropzone": {
-    "title": "Drag & drop your SRT file here",
-    "subtitle": "or click to browse your computer",
-    "support": "Supports standard .srt files (UTF-8, Windows CRLF or Unix LF line endings)",
+    "title": "Drag & drop your subtitle or video file here",
+    "subtitle": "or click to browse from your device",
+    "support": "Supports subtitles (.srt, .vtt, .ass) and videos (.mp4, .mkv, .webm, .mov)",
     "loadedFile": "Loaded file",
     "fileSize": "Size",
     "replaceFile": "Replace file",
-    "samplePrompt": "Don't have an SRT file ready?"
+    "samplePrompt": "Don't have a file at hand?"
   },
   "stats": {
-    "totalBlocks": "Total Subtitle Blocks",
+    "totalBlocks": "Subtitle Blocks",
     "totalDuration": "Total Duration",
     "totalCharacters": "Total Characters",
     "totalWords": "Total Words",
     "avgDuration": "Average Duration"
   },
   "preview": {
-    "title": "Subtitle Cue Preview",
+    "title": "Cues Preview & Validation",
     "subtitle": "In-memory validation and timestamp inspection",
-    "searchPlaceholder": "Search by cue text or ID number...",
-    "id": "#",
-    "timing": "Timestamp Range",
+    "searchPlaceholder": "Search by text or cue number...",
+    "id": "No.",
+    "timing": "Time Interval",
     "duration": "Duration",
-    "sourceText": "Original Source Text",
+    "sourceText": "Source Text",
     "targetText": "Translated Text",
     "status": "Status",
-    "emptySource": "(Empty cue text)",
-    "noResults": "No subtitle cues found matching your search term.",
-    "noFileTitle": "No SRT file loaded yet",
-    "noFileDescription": "Upload an .srt file or click 'Load Sample' to parse and analyze subtitle cues in memory.",
+    "emptySource": "(Empty text content)",
+    "noResults": "No subtitle cues found matching your search criteria.",
+    "noFileTitle": "No file loaded",
+    "noFileDescription": "Upload a subtitle/video file or click 'Load Sample' to inspect and process cues in memory.",
     "showing": "Showing",
     "of": "of",
-    "blocks": "blocks"
+    "blocks": "cues"
   }
 }

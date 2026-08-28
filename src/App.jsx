@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { I18nProvider, useTranslation } from './context/I18nContext';
 import { SettingsProvider, useSettings } from './context/SettingsContext';
 import { useTranslationQueue } from './hooks/useTranslationQueue';
+import { parseSRT } from './utils/srtParser';
 import {
   shiftTimestamps,
   splitCueInList,
@@ -15,6 +16,7 @@ import {
   loadProjectSession,
   clearProjectSession,
 } from './services/storageService';
+import { detectSubtitleTracks } from './services/mediaExtractorService';
 import Header from './components/Header';
 import FileUploader from './components/FileUploader';
 import StatsBar from './components/StatsBar';
@@ -25,6 +27,7 @@ import MediaSyncPlayer from './components/MediaSyncPlayer';
 import SettingsModal from './components/SettingsModal';
 import TimingShiftModal from './components/TimingShiftModal';
 import ExportModal from './components/ExportModal';
+import TrackSelectorModal from './components/TrackSelectorModal';
 import { Sparkles, Shield, Cpu, ExternalLink } from 'lucide-react';
 
 function SubtitleWizardApp() {
@@ -40,13 +43,19 @@ function SubtitleWizardApp() {
   });
 
   const [undoStack, setUndoStack] = useState([]);
-  const [playerResetKey, setPlayerResetKey] = useState(0);
 
-  // Player & Sync state
+  // Player & Media state managed at root
+  const [activeMediaFile, setActiveMediaFile] = useState(null);
+  const [activeMediaUrl, setActiveMediaUrl] = useState(null);
   const [activePlayingCueId, setActivePlayingCueId] = useState(null);
   const [seekTimestampMs, setSeekTimestampMs] = useState(null);
 
-  // Modals state
+  // Extractor & Track selector modal state
+  const [detectedTracks, setDetectedTracks] = useState([]);
+  const [isTrackSelectorOpen, setIsTrackSelectorOpen] = useState(false);
+  const [inspectingMediaFile, setInspectingMediaFile] = useState(null);
+
+  // Other Modals state
   const [isTimingModalOpen, setIsTimingModalOpen] = useState(false);
   const [timingModalInitialCueId, setTimingModalInitialCueId] = useState(null);
   const [timingModalSelectedIds, setTimingModalSelectedIds] = useState([]);
@@ -71,6 +80,15 @@ function SubtitleWizardApp() {
       });
     }
   }, [subtitles, currentFile, queue.sourceLang, queue.targetLang]);
+
+  // Clean up Object URL on unmount
+  useEffect(() => {
+    return () => {
+      if (activeMediaUrl) {
+        URL.revokeObjectURL(activeMediaUrl);
+      }
+    };
+  }, [activeMediaUrl]);
 
   // Save current subtitles to undo history before mutating
   const pushSnapshot = useCallback(() => {
@@ -99,9 +117,14 @@ function SubtitleWizardApp() {
     queue.cancelTranslation();
     setSubtitles([]);
     setCurrentFile(null);
+    if (activeMediaUrl) {
+      URL.revokeObjectURL(activeMediaUrl);
+    }
+    setActiveMediaFile(null);
+    setActiveMediaUrl(null);
+    setDetectedTracks([]);
     setUndoStack([]);
     clearProjectSession();
-    setPlayerResetKey((prev) => prev + 1);
   };
 
   const handleNewProject = () => {
@@ -116,6 +139,113 @@ function SubtitleWizardApp() {
     const confirmed = window.confirm(t('header.actions.clearAllConfirm'));
     if (!confirmed) return;
     handleClear();
+  };
+
+  // Media container dropped in dropzone or loaded from player
+  const handleMediaFileDropped = async (mediaFile) => {
+    if (!mediaFile) return;
+
+    if (activeMediaUrl) {
+      URL.revokeObjectURL(activeMediaUrl);
+    }
+    const newUrl = URL.createObjectURL(mediaFile);
+    setActiveMediaFile(mediaFile);
+    setActiveMediaUrl(newUrl);
+    setInspectingMediaFile(mediaFile);
+
+    try {
+      const tracks = await detectSubtitleTracks(mediaFile);
+      if (tracks && tracks.length > 0) {
+        setDetectedTracks(tracks);
+        setIsTrackSelectorOpen(true);
+      } else {
+        // Video has no embedded text tracks: if workspace empty, create ready initial cue
+        if (subtitles.length === 0) {
+          const initialCues = [
+            {
+              id: 1,
+              startTime: '00:00:01,000',
+              endTime: '00:00:05,000',
+              startMs: 1000,
+              endMs: 5000,
+              sourceText: 'Escribe tu primer subtítulo aquí / Type subtitle here...',
+              targetText: '',
+              status: 'pending',
+            },
+          ];
+          handleSubtitlesLoaded({
+            name: `${mediaFile.name.replace(/\.[^.]+$/, '')}.srt`,
+            size: 0,
+            rawContent: '',
+            subtitles: initialCues,
+            isSample: false,
+          });
+        }
+      }
+    } catch (err) {
+      console.warn('[App] Error inspecting media tracks:', err);
+    }
+  };
+
+  // User dropped both a video and a subtitle file simultaneously
+  const handleMediaAndSubtitlesLoaded = ({ mediaFile, subtitleData }) => {
+    if (activeMediaUrl) {
+      URL.revokeObjectURL(activeMediaUrl);
+    }
+    const newUrl = URL.createObjectURL(mediaFile);
+    setActiveMediaFile(mediaFile);
+    setActiveMediaUrl(newUrl);
+    handleSubtitlesLoaded(subtitleData);
+  };
+
+  // User selected an embedded subtitle track from TrackSelectorModal
+  const handleTrackSelected = ({ track, rawContent, mediaFile }) => {
+    try {
+      const parsed = parseSRT(rawContent);
+      handleSubtitlesLoaded({
+        name: `${mediaFile.name.replace(/\.[^.]+$/, '')}_${track.language || 'track'}.srt`,
+        size: new Blob([rawContent]).size,
+        rawContent,
+        subtitles: parsed,
+        isSample: false,
+      });
+      setIsTrackSelectorOpen(false);
+    } catch (err) {
+      console.error('[App] Error parsing extracted track:', err);
+    }
+  };
+
+  const handleSkipTrackSelection = () => {
+    setIsTrackSelectorOpen(false);
+    if (inspectingMediaFile && subtitles.length === 0) {
+      const initialCues = [
+        {
+          id: 1,
+          startTime: '00:00:01,000',
+          endTime: '00:00:05,000',
+          startMs: 1000,
+          endMs: 5000,
+          sourceText: 'Escribe tu primer subtítulo aquí...',
+          targetText: '',
+          status: 'pending',
+        },
+      ];
+      handleSubtitlesLoaded({
+        name: `${inspectingMediaFile.name.replace(/\.[^.]+$/, '')}.srt`,
+        size: 0,
+        rawContent: '',
+        subtitles: initialCues,
+        isSample: false,
+      });
+    }
+  };
+
+  const handleRemoveMedia = () => {
+    if (activeMediaUrl) {
+      URL.revokeObjectURL(activeMediaUrl);
+    }
+    setActiveMediaFile(null);
+    setActiveMediaUrl(null);
   };
 
   // Cue manipulation operations with undo tracking
@@ -202,8 +332,12 @@ function SubtitleWizardApp() {
               </div>
             </div>
 
-            {/* File Dropzone */}
-            <FileUploader onSubtitlesLoaded={handleSubtitlesLoaded} />
+            {/* Multi-Format File Dropzone */}
+            <FileUploader
+              onSubtitlesLoaded={handleSubtitlesLoaded}
+              onMediaFileDropped={handleMediaFileDropped}
+              onMediaAndSubtitlesLoaded={handleMediaAndSubtitlesLoaded}
+            />
 
           </div>
         ) : (
@@ -213,9 +347,13 @@ function SubtitleWizardApp() {
             {/* 1. Top Media Studio (Left: Stage / Right: Spotify Lyrics) */}
             <section>
               <MediaSyncPlayer
-                key={playerResetKey}
+                key={activeMediaUrl || 'canvas'}
                 subtitles={subtitles}
                 seekTimestampMs={seekTimestampMs}
+                mediaFile={activeMediaFile}
+                mediaUrl={activeMediaUrl}
+                onMediaSelected={handleMediaFileDropped}
+                onRemoveMedia={handleRemoveMedia}
                 onActiveCueChange={setActivePlayingCueId}
                 onUpdateCue={handleUpdateCue}
               />
@@ -277,6 +415,16 @@ function SubtitleWizardApp() {
         onClose={() => setIsExportModalOpen(false)}
         subtitles={subtitles}
         baseFileName={currentFile ? currentFile.name : 'subtitles.srt'}
+      />
+
+      {/* Embedded Subtitle Track Selector Modal */}
+      <TrackSelectorModal
+        isOpen={isTrackSelectorOpen}
+        onClose={() => setIsTrackSelectorOpen(false)}
+        tracks={detectedTracks}
+        mediaFile={inspectingMediaFile}
+        onTrackSelected={handleTrackSelected}
+        onSkip={handleSkipTrackSelection}
       />
 
       {/* Minimal Footer */}

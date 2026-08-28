@@ -14,7 +14,8 @@
     "offline": "Offline",
     "noKey": "No API Key",
     "lmstudio": "LM Studio",
-    "openrouter": "OpenRouter"
+    "openrouter": "OpenRouter",
+    "configurePrompt": "Click here to configure LLM provider"
   },
   "language": {
     "label": "Language",

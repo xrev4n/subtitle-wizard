@@ -1,60 +1,113 @@
 import { useState, useRef } from 'react';
 import { useTranslation } from '../context/I18nContext';
 import { parseSRT, SAMPLE_SRT } from '../utils/srtParser';
+import {
+  isMediaContainer,
+  isStandaloneSubtitle,
+  convertSubtitleToSRT,
+} from '../services/mediaExtractorService';
 import { UploadCloud, FileText, Sparkles, AlertCircle } from 'lucide-react';
 
 export default function FileUploader({
   onSubtitlesLoaded,
+  onMediaFileDropped,
+  onMediaAndSubtitlesLoaded,
 }) {
   const { t } = useTranslation();
   const [isDragging, setIsDragging] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const fileInputRef = useRef(null);
 
-  const processFile = (file) => {
+  const processFileList = (files) => {
     setErrorMessage('');
-    if (!file) return;
+    if (!files || files.length === 0) return;
 
-    // Validate file extension
-    const isSrt = file.name.toLowerCase().endsWith('.srt');
-    if (!isSrt) {
-      setErrorMessage(t('common.alerts.invalidFile'));
+    const fileArray = Array.from(files);
+
+    // Multi-drop: Check if user dropped both a video and a subtitle file
+    const mediaFile = fileArray.find((f) => isMediaContainer(f));
+    const subFile = fileArray.find((f) => isStandaloneSubtitle(f));
+
+    if (mediaFile && subFile && onMediaAndSubtitlesLoaded) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const rawContent = e.target.result;
+          const srtContent = convertSubtitleToSRT(rawContent, subFile.name);
+          const parsed = parseSRT(srtContent);
+          if (parsed.length === 0) {
+            setErrorMessage(t('common.alerts.emptyFile'));
+            return;
+          }
+          onMediaAndSubtitlesLoaded({
+            mediaFile,
+            subtitleData: {
+              name: subFile.name,
+              size: subFile.size,
+              rawContent: srtContent,
+              subtitles: parsed,
+              isSample: false,
+            },
+          });
+        } catch (err) {
+          console.error('Error parsing subtitle file:', err);
+          setErrorMessage(t('common.alerts.invalidFile'));
+        }
+      };
+      reader.onerror = () => setErrorMessage(t('common.alerts.invalidFile'));
+      reader.readAsText(subFile, 'UTF-8');
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const content = e.target.result;
-        if (!content || typeof content !== 'string' || content.trim().length === 0) {
-          setErrorMessage(t('common.alerts.emptyFile'));
-          return;
-        }
-
-        const parsed = parseSRT(content);
-        if (parsed.length === 0) {
-          setErrorMessage(t('common.alerts.emptyFile'));
-          return;
-        }
-
-        onSubtitlesLoaded({
-          name: file.name,
-          size: file.size,
-          rawContent: content,
-          subtitles: parsed,
-          isSample: false,
-        });
-      } catch (err) {
-        console.error('Error parsing SRT file:', err);
-        setErrorMessage(t('common.alerts.invalidFile'));
+    // Single file processing
+    const file = fileArray[0];
+    if (isMediaContainer(file)) {
+      if (onMediaFileDropped) {
+        onMediaFileDropped(file);
       }
-    };
+      return;
+    }
 
-    reader.onerror = () => {
-      setErrorMessage(t('common.alerts.invalidFile'));
-    };
+    if (isStandaloneSubtitle(file)) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const rawContent = e.target.result;
+          if (!rawContent || typeof rawContent !== 'string' || rawContent.trim().length === 0) {
+            setErrorMessage(t('common.alerts.emptyFile'));
+            return;
+          }
 
-    reader.readAsText(file, 'UTF-8');
+          const srtContent = convertSubtitleToSRT(rawContent, file.name);
+          const parsed = parseSRT(srtContent);
+          if (parsed.length === 0) {
+            setErrorMessage(t('common.alerts.emptyFile'));
+            return;
+          }
+
+          onSubtitlesLoaded({
+            name: file.name.replace(/\.(vtt|ass|ssa)$/i, '.srt'),
+            size: file.size,
+            rawContent: srtContent,
+            subtitles: parsed,
+            isSample: false,
+          });
+        } catch (err) {
+          console.error('Error parsing subtitle file:', err);
+          setErrorMessage(t('common.alerts.invalidFile'));
+        }
+      };
+
+      reader.onerror = () => {
+        setErrorMessage(t('common.alerts.invalidFile'));
+      };
+
+      reader.readAsText(file, 'UTF-8');
+      return;
+    }
+
+    // If file extension is unsupported
+    setErrorMessage(t('common.alerts.invalidFile'));
   };
 
   const handleDragOver = (e) => {
@@ -75,15 +128,13 @@ export default function FileUploader({
     setIsDragging(false);
 
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      const file = e.dataTransfer.files[0];
-      processFile(file);
+      processFileList(e.dataTransfer.files);
     }
   };
 
   const handleFileInputChange = (e) => {
     if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
-      processFile(file);
+      processFileList(e.target.files);
     }
   };
 
@@ -101,14 +152,15 @@ export default function FileUploader({
 
   return (
     <div className="w-full space-y-4">
-      {/* Hidden native input */}
+      {/* Hidden native input with multiple format support */}
       <input
         type="file"
         ref={fileInputRef}
         onChange={handleFileInputChange}
-        accept=".srt"
+        accept=".srt,.vtt,.ass,.ssa,.mp4,.mkv,.webm,.mov,.m4v,.mp3,.wav"
+        multiple
         className="hidden"
-        id="srt-file-input"
+        id="media-subtitle-file-input"
       />
 
       {/* Error alert */}
@@ -178,6 +230,18 @@ export default function FileUploader({
               <Sparkles className="w-4 h-4 text-amber-400" />
               {t('common.actions.sample')}
             </button>
+          </div>
+
+          {/* Supported format tags */}
+          <div className="flex flex-wrap items-center justify-center gap-1.5 pt-3">
+            {['.SRT', '.VTT', '.ASS', '.MP4', '.MKV', '.WEBM', '.MOV'].map((fmt) => (
+              <span
+                key={fmt}
+                className="px-2 py-0.5 rounded-md text-[10px] font-mono text-slate-400 bg-slate-900/90 border border-white/10"
+              >
+                {fmt}
+              </span>
+            ))}
           </div>
 
         </div>

@@ -1,8 +1,8 @@
 {
   "dropzone": {
-    "title": "Arrastra y suelta tu archivo SRT aquí",
+    "title": "Arrastra y suelta tu archivo de subtítulos o video aquí",
     "subtitle": "o haz clic para explorar en tu equipo",
-    "support": "Compatible con archivos .srt estándar (UTF-8, saltos Windows CRLF o Unix LF)",
+    "support": "Soporta subtítulos (.srt, .vtt, .ass) y videos (.mp4, .mkv, .webm, .mov)",
     "loadedFile": "Archivo cargado",
     "fileSize": "Tamaño",
     "replaceFile": "Reemplazar archivo",
@@ -28,7 +28,7 @@
     "emptySource": "(Sin contenido de texto)",
     "noResults": "No se encontraron bloques con el término de búsqueda ingresado.",
     "noFileTitle": "Ningún archivo cargado",
-    "noFileDescription": "Sube un archivo .srt o pulsa en 'Cargar Ejemplo' para procesar y analizar los bloques en memoria.",
+    "noFileDescription": "Sube un archivo de subtítulo/video o pulsa en 'Cargar Ejemplo' para procesar y analizar los bloques en memoria.",
     "showing": "Mostrando",
     "of": "de",
     "blocks": "bloques"

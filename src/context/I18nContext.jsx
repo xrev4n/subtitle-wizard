@@ -10,6 +10,7 @@ import esTranslation from '../locales/es/translation.json';
 import esEditor from '../locales/es/editor.json';
 import esExport from '../locales/es/export.json';
 import esPlayer from '../locales/es/player.json';
+import esExtractor from '../locales/es/extractor.json';
 
 // English locales
 import enCommon from '../locales/en/common.json';
@@ -20,6 +21,7 @@ import enTranslation from '../locales/en/translation.json';
 import enEditor from '../locales/en/editor.json';
 import enExport from '../locales/en/export.json';
 import enPlayer from '../locales/en/player.json';
+import enExtractor from '../locales/en/extractor.json';
 
 const translations = {
   es: {
@@ -31,6 +33,7 @@ const translations = {
     editor: esEditor,
     export: esExport,
     player: esPlayer,
+    extractor: esExtractor,
   },
   en: {
     common: enCommon,
@@ -41,6 +44,7 @@ const translations = {
     editor: enEditor,
     export: enExport,
     player: enPlayer,
+    extractor: enExtractor,
   },
 };
 
