@@ -344,7 +344,7 @@ function SubtitleWizardApp() {
           /* Active Unified Workspace */
           <div className="space-y-6 animate-fadeIn">
             
-            {/* 1. Top Media Studio (Left: Stage / Right: Spotify Lyrics) */}
+            {/* 1. Top Media Studio (Left: Stage / Right: Live Lyrics) */}
             <section>
               <MediaSyncPlayer
                 key={activeMediaUrl || 'canvas'}

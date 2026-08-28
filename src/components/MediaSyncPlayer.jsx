@@ -311,7 +311,7 @@ export default function MediaSyncPlayer({
         </div>
       </div>
 
-      {/* Main 2-Column Studio: Left = Video/Canvas Stage | Right = Spotify Lyrics Flow Panel */}
+      {/* Main 2-Column Studio: Left = Video/Canvas Stage | Right = Live Lyrics Flow Panel */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 lg:divide-x divide-white/10 bg-slate-950/60">
         
         {/* LEFT COLUMN: Stage & Player Controls (Span 7 on lg) */}
@@ -485,7 +485,7 @@ export default function MediaSyncPlayer({
 
         </div>
 
-        {/* RIGHT COLUMN: Interactive Spotify Lyrics Flow & Live In-Place Editor (Span 5 on lg) */}
+        {/* RIGHT COLUMN: Interactive Live Lyrics Flow & Live In-Place Editor (Span 5 on lg) */}
         <div className="lg:col-span-5 p-4 sm:p-5 flex flex-col h-full min-h-[380px] max-h-[460px]">
           <LyricsSyncPanel
             subtitles={subtitles}

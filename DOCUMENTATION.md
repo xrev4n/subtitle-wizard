@@ -1,6 +1,6 @@
 # Subtitle Wizard 🪄
 
-> **100% In-Memory, Client-Side Subtitle Processing, Interactive Editor, Spotify Lyrics Studio, AI Translation & Universal Media Subtitle Extractor**
+> **100% In-Memory, Client-Side Subtitle Processing, Interactive Editor, Live Lyrics Studio, AI Translation & Universal Media Subtitle Extractor**
 > 
 > *Optimized for AI Agents, Pair-Programming Assistants & Human Developers.*
 
@@ -16,12 +16,12 @@
 - **Dual LLM Provider Architecture (LM Studio & OpenRouter)**:
   - **LM Studio (Local / Private)**: 100% offline inference on your own hardware via local endpoints (`http://localhost:1234/v1`).
   - **OpenRouter (Cloud API / BYOK)**: Access DeepSeek V3/R1, Claude 3.5 Sonnet, Gemini 2.0 Flash, Llama 3.3 70B, GPT-4o Mini and more using your own OpenRouter API key stored safely in browser `localStorage`.
-- **Unified Workspace & Always-On Studio**: An elegant, continuous interface where the Media Stage (Video or Dark Canvas Preview) and the Spotify Lyrics/Live Editor coexist side-by-side.
+- **Unified Workspace & Always-On Studio**: An elegant, continuous interface where the Media Stage (Video or Dark Canvas Preview) and the Live Lyrics/Editor coexist side-by-side.
 - **AI Batch Translation Engine with 1:1 ID Guarantee**: Slices subtitle cues into configurable batches, enforces strict JSON structured output, preserves multi-speaker dialogues (`- Speaker 1\n- Speaker 2`), validates 1:1 cue ID integrity, and automatically degrades to 1x1 micro-batching to prevent off-by-one errors.
 - **Interactive In-Memory Subtitle Editor**: In-place text and timestamp editing, cue insertion, cue splitting, adjacent merging, and non-destructive Undo support.
 - **Precision Timing Shift Tools**: Millisecond-accurate global, progressive, or selective time shifts with automatic zero clamping.
 - **Temporal Integrity Diagnostics**: Instant detection and visual flagging of cue overlaps, invalid durations (<100ms), and empty subtitle blocks.
-- **Spotify Lyrics-Style Interactive Panel**: Real-time flowing subtitles on the right of the video featuring smooth auto-scroll to the active line, dimmed inactive cues, and in-place editing that automatically pauses media playback.
+- **Live Lyrics-Style Interactive Panel**: Real-time flowing subtitles on the right of the video featuring smooth auto-scroll to the active line, dimmed inactive cues, and in-place editing that automatically pauses media playback.
 - **Multi-Format Export Suite**: Export to canonical SubRip (`.srt`), WebVTT (`.vtt`), Advanced SubStation Alpha (`.ass`), and Plain Text (`.txt`) with Single (Translated/Source) or Bilingual Dual modes.
 - **Modular i18n**: Fully decoupled JSON internationalization system (Spanish / English) without external packages.
 - **Session Auto-Persistence & Memory Wipe**: Automatic local restoration of workspace state between browser reloads, with a 1-click "Borrar Todo" memory cleaner.
@@ -44,7 +44,7 @@
 | **Dual LLM Client** | Native `fetch` + `AbortController` (`src/services/llmService.js`) | Dual provider client supporting LM Studio and OpenRouter BYOK |
 | **Batch Translation Engine** | Custom Orchestrator (`src/hooks/useTranslationQueue.js` & `translationService.js`) | 1:1 ID validator, multi-speaker dialogue prompt, and 1x1 micro-batch fallback |
 | **Local Media Player** | HTML5 Media API (`src/components/MediaSyncPlayer.jsx`) | Memory-safe `URL.createObjectURL` video/audio live sync & pitch-black canvas stage |
-| **Spotify Lyrics Panel** | Custom Sync Engine (`src/components/LyricsSyncPanel.jsx`) | Smooth auto-scroll, auto-pause on focus, and channel viewing |
+| **Live Lyrics Panel** | Custom Sync Engine (`src/components/LyricsSyncPanel.jsx`) | Smooth auto-scroll, auto-pause on focus, and channel viewing |
 | **Session Persistence** | Web Storage (`src/services/storageService.js`) | Automatic client-side project snapshot caching & wipe |
 
 ---
@@ -126,7 +126,7 @@ subtitle-wizard/
 │   │   ├── ExportModal.jsx               # Multi-format export dialog (.srt, .vtt, .ass, .txt, dual)
 │   │   ├── FileUploader.jsx              # Multi-format dropzone (.srt, .vtt, .ass, .mp4, .mkv, .mov)
 │   │   ├── Header.jsx                    # Header with square logo, provider latency badge & actions
-│   │   ├── LyricsSyncPanel.jsx           # Spotify-style lyrics vertical flow, auto-scroll & auto-pause
+│   │   ├── LyricsSyncPanel.jsx           # Live flowing lyrics panel, auto-scroll & auto-pause
 │   │   ├── MediaSyncPlayer.jsx           # Always-on 2-column Media Studio (Video/Canvas + Lyrics)
 │   │   ├── SettingsModal.jsx             # Dual LLM provider configuration (LM Studio & OpenRouter BYOK)
 │   │   ├── StatsBar.jsx                  # Aggregate metrics summary cards (blocks, duration, words)
@@ -190,7 +190,7 @@ subtitle-wizard/
 | **Phase 2** | **Local LLM Server Integration & Diagnostic Module** | ✅ **Completed** | Native fetch `llmService.js` (/models, /chat/completions), `SettingsContext`, `SettingsModal`, live latency tracking, dynamic model discovery, test inference engine. |
 | **Phase 3** | **Batch Translation Engine & Queue Management** | ✅ **Completed** | `translationService.js` with strict JSON prompt schema & resilient parser, `useTranslationQueue.js` hook with pause/resume/cancel/retry, `TranslationControlBar`, `TranslationProgressBar`, dual comparative preview. |
 | **Phase 4** | **Interactive Subtitle Editor & Timing Shift Tools** | ✅ **Completed** | `timingUtils.js` (shift, split, merge, insert, delete, validate), `TimingShiftModal`, in-place editable cues, visual overlap diagnostics, undo history stack. |
-| **Phase 5** | **Multi-Format Export & Synchronized Media Player** | ✅ **Completed** | `exporters.js` (SRT, VTT, ASS, TXT, Dual), `ExportModal`, `MediaSyncPlayer` with live caption overlay and bidirectional click-to-seek, `LyricsSyncPanel` (Spotify Lyrics mode with auto-scroll & auto-pause), `storageService.js` session auto-saving. |
+| **Phase 5** | **Multi-Format Export & Synchronized Media Player** | ✅ **Completed** | `exporters.js` (SRT, VTT, ASS, TXT, Dual), `ExportModal`, `MediaSyncPlayer` with live caption overlay and bidirectional click-to-seek, `LyricsSyncPanel` (Live Lyrics mode with auto-scroll & auto-pause), `storageService.js` session auto-saving. |
 | **Provider Expansion** | **OpenRouter Native Integration (Cloud BYOK)** | ✅ **Completed** | Dual provider selector in `SettingsModal`, secure `localStorage` API key storage, OpenRouter models library, attribution headers, and dynamic Header status badge. |
 | **Media Extraction** | **Universal In-Memory Subtitle Extraction Engine** | ✅ **Completed** | `mediaExtractorService.js` (MKV/WebM EBML & MP4/MOV atom demuxers), `TrackSelectorModal`, multi-file drag & drop (video + subtitles), standalone VTT/ASS converters. |
 

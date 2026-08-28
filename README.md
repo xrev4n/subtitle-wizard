@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <strong>100% Client-Side Subtitle Processing, Interactive Editor, Spotify Lyrics Studio, AI Translation & Universal Media Extractor</strong>
+  <strong>100% Client-Side Subtitle Processing, Interactive Editor, Live Lyrics Studio, AI Translation & Universal Media Extractor</strong>
 </p>
 
 <p align="center">
@@ -45,7 +45,7 @@ Everything runs locally in your web browser: **zero backend servers**, **zero in
   - **LM Studio (100% Offline & Private):** Connect to your local LLM server at `http://localhost:1234/v1` for private translation.
   - **OpenRouter (Bring Your Own Key):** Access models like DeepSeek V3/R1, Claude 3.5 Sonnet, Gemini 2.0 Flash, GPT-4o Mini, and Llama 3.3 directly with your personal API key stored safely in browser `localStorage`.
 - **Batch Translation with 1:1 ID Guarantee:** Batches subtitle cues, preserves multi-speaker dialogues (`- Line 1\n- Line 2`), and automatically degrades to 1x1 micro-batching if JSON response alignment requires it.
-- **Interactive Spotify-Style Lyrics Studio:** A dedicated side-by-side player featuring smooth auto-scroll to the active subtitle, darkened inactive cues, and in-place editing that automatically pauses playback when focused.
+- **Interactive Live Lyrics Studio:** A dedicated side-by-side player featuring smooth auto-scroll to the active subtitle, darkened inactive cues, and in-place editing that automatically pauses playback when focused.
 - **Built-in Timing Shift & Diagnostic Tools:** Millisecond-accurate global, progressive, or selective timestamp shifts, plus automated detection of cue overlaps and invalid durations.
 - **Multi-Format Export Suite:** Export seamlessly to SubRip (`.srt`), WebVTT (`.vtt`), Advanced SubStation Alpha (`.ass`), Plain Text (`.txt`), or Bilingual Dual-Language files.
 - **Session Auto-Persistence & Memory Wipe:** Automatically resumes your workspace across page reloads via `localStorage`, with a 1-click *Clear All* button to reset memory.
@@ -152,7 +152,7 @@ Todo se procesa localmente en tu cliente: **cero servidores backend**, **cero in
   - **LM Studio (100% Privado y Offline):** Conéctate a tu servidor local en `http://localhost:1234/v1` para traducir sin conexión ni costes.
   - **OpenRouter (Trae Tu Propia API Key):** Utiliza modelos de primer nivel como DeepSeek V3/R1, Claude 3.5 Sonnet, Gemini 2.0 Flash, GPT-4o Mini o Llama 3.3 con tu propia API key guardada con seguridad en el `localStorage` de tu navegador.
 - **Traducción por Lotes con Garantía de Integridad 1:1:** Procesa bloques en lotes, preserva diálogos entre varios personajes (`- Línea 1\n- Línea 2`) y degrada a micro-lotes 1x1 si la estructura JSON requiere alineación.
-- **Estudio de Sincronización Estilo Spotify Lyrics:** Visualizador interactivo con auto-scroll fluido a la línea activa, atenuación de líneas inactivas y edición directa que pausa automáticamente el video al hacer foco.
+- **Estudio de Sincronización y Flujo de Letras en Vivo:** Visualizador interactivo con auto-scroll fluido a la línea activa, atenuación de líneas inactivas y edición directa que pausa automáticamente el video al hacer foco.
 - **Herramientas de Desfase de Tiempo y Diagnóstico:** Ajuste milimétrico global, progresivo o selectivo con protección contra marcas negativas y detección instantánea de solapamientos o duraciones inválidas.
 - **Suite de Exportación Multiformato:** Exporta en SubRip (`.srt`), WebVTT (`.vtt`), Advanced SubStation Alpha (`.ass`), Texto Plano (`.txt`) o modo Bilingüe Dual.
 - **Persistencia de Sesión y Limpieza de Memoria:** Guarda tu progreso automáticamente entre recargas con un botón de *Borrar Todo* para limpiar la memoria al instante.

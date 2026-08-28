@@ -25,7 +25,7 @@ export default function LyricsSyncPanel({
   const activeRowRef = useRef(null);
   const containerRef = useRef(null);
 
-  // Smooth Auto-scroll to active cue in Spotify style (unless paused for editing or disabled)
+  // Smooth Auto-scroll to active cue (unless paused for editing or disabled)
   useEffect(() => {
     if (autoScroll && !isEditing && activeCueId && activeRowRef.current) {
       activeRowRef.current.scrollIntoView({
@@ -143,7 +143,7 @@ export default function LyricsSyncPanel({
 
       </div>
 
-      {/* Spotify Lyrics Flow Container */}
+      {/* Live Lyrics Flow Container */}
       <div
         ref={containerRef}
         className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-2.5 divide-y divide-white/[0.03]"
